@@ -1,15 +1,22 @@
 import { clients } from "../constants";
-import styles from "../style";
+import Marquee from "./ui/Marquee";
 
 const Clients = () => (
-  <section className={`${styles.flexCenter} my-4`}>
-    <div className={`${styles.flexCenter} flex-wrap w-full`}>
-      {clients.map((client) => (
-        <div key={client.id} className={`flex-1 ${styles.flexCenter} sm:min-w-[192px] min-w-[120px] m-5`}>
-          <img src={client.logo} alt="client_logo" className="sm:w-[192px] w-[100px] object-contain" />
-        </div>
+  <section aria-label="Trusted by" className="my-8">
+    <p className="font-poppins text-center text-[14px] tracking-[0.18em] uppercase text-dimWhite mb-6">
+      Trusted by teams at
+    </p>
+    <Marquee duration={26}>
+      {[...clients, ...clients].map((client, i) => (
+        <img
+          key={`${client.id}-${i}`}
+          src={client.logo}
+          alt={i < clients.length ? client.name : ""}
+          loading="lazy"
+          className="sm:w-[192px] w-[120px] object-contain opacity-70 hover:opacity-100 transition"
+        />
       ))}
-    </div>
+    </Marquee>
   </section>
 );
 

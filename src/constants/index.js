@@ -1,46 +1,46 @@
-import { people01, people02, people03, facebook, instagram, linkedin, twitter, airbnb, binance, coinbase, dropbox, send, shield, star  } from "../assets";
+import {
+  people01,
+  people02,
+  people03,
+  facebook,
+  instagram,
+  linkedin,
+  twitter,
+  airbnb,
+  binance,
+  coinbase,
+  dropbox,
+  send,
+  shield,
+  star,
+} from "../assets";
 
+export * from "./features";
+
+/** Primary navigation (desktop bar + mobile menu). */
 export const navLinks = [
-  {
-    id: "home",
-    title: "Home",
-  },
-  {
-    id: "features",
-    title: "Features",
-  },
-  {
-    id: "product",
-    title: "Product",
-  },
-  {
-    id: "clients",
-    title: "Clients",
-  },
+  { id: "features", title: "Features", to: "/features" },
+  { id: "product", title: "Product", to: "/product" },
+  { id: "cards", title: "Cards", to: "/cards" },
+  { id: "pricing", title: "Pricing", to: "/pricing" },
+  { id: "business", title: "Business", to: "/business" },
+  { id: "help", title: "Help", to: "/help" },
 ];
 
-export const features = [
-  {
-    id: "feature-1",
-    icon: star,
-    title: "Rewards",
-    content:
-      "The best credit cards offer some tantalizing combinations of promotions and prizes",
-  },
-  {
-    id: "feature-2",
-    icon: shield,
-    title: "100% Secured",
-    content:
-      "We take proactive steps make sure your information and transactions are secure.",
-  },
-  {
-    id: "feature-3",
-    icon: send,
-    title: "Balance Transfer",
-    content:
-      "A balance transfer credit card can save you a lot of money in interest charges.",
-  },
+/** Extra links only shown in the mobile menu. */
+export const mobileExtraLinks = [
+  { title: "Security", to: "/security" },
+  { title: "About", to: "/about" },
+  { title: "Careers", to: "/careers" },
+  { title: "Blog", to: "/blog" },
+  { title: "Contact", to: "/contact" },
+];
+
+/** The three highlight features shown on the landing page (full list lives in ./features.js). */
+export const homeFeatures = [
+  { slug: "rewards", icon: star },
+  { slug: "secured", icon: shield },
+  { slug: "balance-transfer", icon: send },
 ];
 
 export const feedback = [
@@ -54,8 +54,7 @@ export const feedback = [
   },
   {
     id: "feedback-2",
-    content:
-      "Money makes your life easier. If you're lucky to have it, you're lucky.",
+    content: "Money makes your life easier. If you're lucky to have it, you're lucky.",
     name: "Steve Mark",
     title: "Founder & Leader",
     img: people02,
@@ -70,128 +69,60 @@ export const feedback = [
   },
 ];
 
+/** Count-up stats. `value` is numeric so it can animate. */
 export const stats = [
-  {
-    id: "stats-1",
-    title: "User Active",
-    value: "3800+",
-  },
-  {
-    id: "stats-2",
-    title: "Trusted by Company",
-    value: "230+",
-  },
-  {
-    id: "stats-3",
-    title: "Transaction",
-    value: "$230M+",
-  },
+  { id: "stats-1", title: "User Active", value: 3800, suffix: "+" },
+  { id: "stats-2", title: "Trusted by Company", value: 230, suffix: "+" },
+  { id: "stats-3", title: "Transaction", value: 230, prefix: "$", suffix: "M+" },
 ];
 
 export const footerLinks = [
   {
-    title: "Useful Links",
+    title: "Product",
     links: [
-      {
-        name: "Content",
-        link: "https://www.hoobank.com/content/",
-      },
-      {
-        name: "How it Works",
-        link: "https://www.hoobank.com/how-it-works/",
-      },
-      {
-        name: "Create",
-        link: "https://www.hoobank.com/create/",
-      },
-      {
-        name: "Explore",
-        link: "https://www.hoobank.com/explore/",
-      },
-      {
-        name: "Terms & Services",
-        link: "https://www.hoobank.com/terms-and-services/",
-      },
+      { name: "Features", to: "/features" },
+      { name: "Product tour", to: "/product" },
+      { name: "Cards", to: "/cards" },
+      { name: "Pricing", to: "/pricing" },
+      { name: "Live demo", to: "/dashboard" },
     ],
   },
   {
-    title: "Community",
+    title: "Company",
     links: [
-      {
-        name: "Help Center",
-        link: "https://www.hoobank.com/help-center/",
-      },
-      {
-        name: "Partners",
-        link: "https://www.hoobank.com/partners/",
-      },
-      {
-        name: "Suggestions",
-        link: "https://www.hoobank.com/suggestions/",
-      },
-      {
-        name: "Blog",
-        link: "https://www.hoobank.com/blog/",
-      },
-      {
-        name: "Newsletters",
-        link: "https://www.hoobank.com/newsletters/",
-      },
+      { name: "About us", to: "/about" },
+      { name: "Careers", to: "/careers" },
+      { name: "Blog", to: "/blog" },
+      { name: "Contact", to: "/contact" },
     ],
   },
   {
-    title: "Partner",
+    title: "Resources",
     links: [
-      {
-        name: "Our Partner",
-        link: "https://www.hoobank.com/our-partner/",
-      },
-      {
-        name: "Become a Partner",
-        link: "https://www.hoobank.com/become-a-partner/",
-      },
+      { name: "Help Center", to: "/help" },
+      { name: "Business", to: "/business" },
+      { name: "Security", to: "/security" },
+      { name: "Privacy Policy", to: "/privacy" },
+      { name: "Terms & Services", to: "/terms" },
     ],
   },
 ];
 
 export const socialMedia = [
-  {
-    id: "social-media-1",
-    icon: instagram,
-    link: "https://www.instagram.com/",
-  },
-  {
-    id: "social-media-2",
-    icon: facebook,
-    link: "https://www.facebook.com/",
-  },
-  {
-    id: "social-media-3",
-    icon: twitter,
-    link: "https://www.twitter.com/",
-  },
-  {
-    id: "social-media-4",
-    icon: linkedin,
-    link: "https://www.linkedin.com/",
-  },
+  { id: "social-media-1", name: "Instagram", icon: instagram, link: "https://www.instagram.com/" },
+  { id: "social-media-2", name: "Facebook", icon: facebook, link: "https://www.facebook.com/" },
+  { id: "social-media-3", name: "Twitter", icon: twitter, link: "https://www.twitter.com/" },
+  { id: "social-media-4", name: "LinkedIn", icon: linkedin, link: "https://www.linkedin.com/" },
 ];
 
 export const clients = [
-  {
-    id: "client-1",
-    logo: airbnb,
-  },
-  {
-    id: "client-2",
-    logo: binance,
-  },
-  {
-    id: "client-3",
-    logo: coinbase,
-  },
-  {
-    id: "client-4",
-    logo: dropbox,
-  },
+  { id: "client-1", name: "Airbnb", logo: airbnb },
+  { id: "client-2", name: "Binance", logo: binance },
+  { id: "client-3", name: "Coinbase", logo: coinbase },
+  { id: "client-4", name: "Dropbox", logo: dropbox },
 ];
+
+export const storeLinks = {
+  apple: "https://www.apple.com/app-store/",
+  google: "https://play.google.com/store",
+};

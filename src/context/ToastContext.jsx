@@ -1,0 +1,78 @@
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import Icon from "../components/ui/Icon";
+
+const ToastContext = createContext(null);
+
+const VARIANTS = {
+  success: { icon: "check", ring: "bg-blue-gradient text-primary" },
+  info: { icon: "info", ring: "bg-white/10 text-secondary" },
+  error: { icon: "x", ring: "bg-red-500/20 text-red-300" },
+};
+
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const idRef = useRef(0);
+
+  const dismiss = useCallback((id) => {
+    setToasts((list) => list.filter((t) => t.id !== id));
+  }, []);
+
+  const toast = useCallback(
+    ({ title, description = "", variant = "success", duration = 4200 }) => {
+      idRef.current += 1;
+      const id = idRef.current;
+      setToasts((list) => [...list.slice(-3), { id, title, description, variant }]);
+      window.setTimeout(() => dismiss(id), duration);
+      return id;
+    },
+    [dismiss]
+  );
+
+  const value = useMemo(() => ({ toast, dismiss }), [toast, dismiss]);
+
+  return (
+    <ToastContext.Provider value={value}>
+      {children}
+      <div
+        aria-live="polite"
+        aria-atomic="false"
+        className="fixed z-[100] top-4 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-24 md:bottom-6 sm:left-6 sm:translate-x-0 flex flex-col gap-3 w-[calc(100vw-32px)] max-w-[380px] pointer-events-none"
+      >
+        {toasts.map((t) => {
+          const v = VARIANTS[t.variant] ?? VARIANTS.success;
+          return (
+            <div
+              key={t.id}
+              role="status"
+              className="pointer-events-auto glass bg-[#0b0f1d]/90 rounded-[16px] p-4 flex items-start gap-3 shadow-2xl animate-fade-up"
+            >
+              <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${v.ring}`}>
+                <Icon name={v.icon} size={16} />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="font-poppins font-semibold text-[15px] text-white">{t.title}</p>
+                {t.description && (
+                  <p className="font-poppins text-[13px] leading-[20px] text-dimWhite mt-0.5">{t.description}</p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => dismiss(t.id)}
+                aria-label="Dismiss notification"
+                className="text-dimWhite hover:text-white transition"
+              >
+                <Icon name="x" size={16} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </ToastContext.Provider>
+  );
+}
+
+export function useToast() {
+  const ctx = useContext(ToastContext);
+  if (!ctx) throw new Error("useToast must be used inside <ToastProvider>");
+  return ctx.toast;
+}
