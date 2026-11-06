@@ -49,7 +49,7 @@ const IncomeSplit = ({ className = "" }) => {
         <div className="flex h-12 w-full overflow-hidden rounded-[6px]" role="img" aria-label={data.map((d) => `${d.label} ${d.pct}%`).join(", ")}>
           {data.map((d) => (
             <div key={d.label} className="h-full transition-[width] duration-500 flex items-center px-1.5 sm:px-3 min-w-0" style={{ width: `${d.pct}%`, background: d.color }}>
-              <span className="font-sans font-semibold text-[13px] num truncate" style={{ color: d.fg }}>
+              <span className={`font-sans font-semibold text-[13px] num truncate ${d.pct < 8 ? "sr-only" : ""}`} style={{ color: d.fg }}>
                 {d.pct}%
               </span>
             </div>
