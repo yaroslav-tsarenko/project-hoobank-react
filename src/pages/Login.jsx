@@ -11,7 +11,7 @@ import usePageMeta from "../hooks/usePageMeta";
 import styles from "../style";
 
 const Login = () => {
-  usePageMeta("Log in", "Log in to your HooBank account.");
+  usePageMeta("Log in", "Log in to the Northvault demo workspace.");
   const navigate = useNavigate();
   const toast = useToast();
   const [form, setForm] = useState({ email: "", password: "", remember: true });
@@ -22,47 +22,48 @@ const Login = () => {
   const enterDemo = (message) => {
     setLoading(true);
     window.setTimeout(() => {
-      toast({ title: "Welcome back, Alex!", description: message });
+      toast({ title: "Welcome back, Alex", description: message });
       navigate("/dashboard");
-    }, 800);
+    }, 700);
   };
 
   const submit = (e) => {
     e.preventDefault();
     const next = {};
     if (!EMAIL_RE.test(form.email)) next.email = "Enter the email you signed up with.";
-    if (form.password.length < 6) next.password = "Password must be at least 6 characters.";
+    if (form.password.length < 6) next.password = "Passwords are at least 6 characters.";
     setErrors(next);
     if (Object.keys(next).length) return;
-    enterDemo("Demo mode: any credentials work. Nothing is sent anywhere.");
+    enterDemo("Demo mode: any credentials work and nothing is sent anywhere.");
   };
 
   return (
-    <Container className="py-10 sm:py-16 relative">
-      <div className="absolute w-[40%] h-[50%] right-0 top-0 pink__gradient opacity-50" aria-hidden="true" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative">
-        <div className="hidden md:flex flex-col items-start">
-          <h1 className={styles.heading1}>
-            Welcome <span className="text-gradient">back.</span>
-          </h1>
-          <p className={`${styles.paragraph} mt-5 max-w-[440px]`}>Your money is right where you left it — growing, protected and ready to move.</p>
-          <div className="w-full max-w-[420px] mt-10 motion-safe:animate-float">
-            <CreditCard design={{ color: "ocean", finish: "metal", name: "Alex Morgan", tier: "Premium" }} />
+    <Container className="py-10 sm:py-16">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+        <div className="hidden md:flex md:col-span-6 rounded-card bg-forest text-ivory p-10 lg:p-14 flex-col justify-between overflow-hidden">
+          <div>
+            <p className="font-sans text-[12px] uppercase tracking-[0.14em] text-brass-light">Morgan Studio</p>
+            <h1 className="font-serif text-[56px] leading-[1.02] mt-6">
+              Welcome <em className="italic">back.</em>
+            </h1>
+            <p className="font-sans text-[17px] leading-[1.6] text-ivory/80 mt-5 max-w-[400px]">Two invoices were paid while you were away, and the tax pot is 79% of the way to its target.</p>
+          </div>
+          <div className="w-full max-w-[380px] mt-12 rotate-[-4deg]">
+            <CreditCard design={{ color: "ivory", finish: "matte", name: "Alex Morgan", tier: "Studio" }} tilt={false} />
           </div>
         </div>
 
-        <form onSubmit={submit} noValidate className={`${styles.card} p-6 sm:p-10 w-full max-w-[480px] mx-auto flex flex-col gap-5 border-gradient`}>
+        <form onSubmit={submit} noValidate className={`md:col-span-6 ${styles.card} p-6 sm:p-10 lg:p-14 w-full flex flex-col gap-5 justify-center`}>
           <div>
-            <h2 className={`${styles.heading3} md:block hidden`}>Log in</h2>
-            <h1 className={`${styles.heading3} md:hidden`}>Log in</h1>
-            <p className="font-poppins text-dimWhite text-[15px] mt-1">
-              New to HooBank?{" "}
-              <Link to="/signup" className="text-secondary hover:underline">
-                Create an account
+            <h2 className="font-serif text-[44px] leading-none text-ink">Log in</h2>
+            <p className="font-sans text-muted text-[15px] mt-3">
+              New to Northvault?{" "}
+              <Link to="/signup" className="text-forest link">
+                Open an account
               </Link>
             </p>
           </div>
-          <Field label="Email" type="email" autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} error={errors.email} placeholder="you@example.com" />
+          <Field label="Email" type="email" autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} error={errors.email} placeholder="you@studio.com" />
           <Field
             label="Password"
             type={show ? "text" : "password"}
@@ -71,44 +72,36 @@ const Login = () => {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             error={errors.password}
             right={
-              <button type="button" onClick={() => setShow((s) => !s)} aria-label={show ? "Hide password" : "Show password"} className="w-9 h-9 rounded-full text-dimWhite hover:text-white flex items-center justify-center">
+              <button type="button" onClick={() => setShow((s) => !s)} aria-label={show ? "Hide password" : "Show password"} className="w-9 h-9 rounded-full text-muted hover:text-ink flex items-center justify-center">
                 <Icon name={show ? "eyeOff" : "eye"} size={18} />
               </button>
             }
           />
-          <div className="flex items-center justify-between gap-4 font-poppins text-[14px]">
-            <label className="flex items-center gap-2 text-dimWhite cursor-pointer">
-              <input type="checkbox" checked={form.remember} onChange={(e) => setForm({ ...form, remember: e.target.checked })} className="w-4 h-4 accent-[#5ce1e6]" />
-              Remember me
+          <div className="flex items-center justify-between gap-4 font-sans text-[14px]">
+            <label className="flex items-center gap-2 text-muted cursor-pointer">
+              <input type="checkbox" checked={form.remember} onChange={(e) => setForm({ ...form, remember: e.target.checked })} className="w-4 h-4" />
+              Keep me signed in
             </label>
-            <Link to="/help" className="text-secondary hover:underline">
+            <Link to="/help" className="text-forest link">
               Forgot password?
             </Link>
           </div>
           <Button type="submit" disabled={loading}>
-            {loading ? <span className="spinner !w-5 !h-5 !border-2" aria-label="Signing in" /> : "Log in"}
+            {loading ? <span className="spinner !w-5 !h-5 !border-2 !border-ivory/30 !border-t-ivory" aria-label="Signing in" /> : "Log in"}
           </Button>
-          <div className="flex items-center gap-4 font-poppins text-[13px] text-dimWhite">
-            <span className="flex-1 h-px bg-white/10" /> or <span className="flex-1 h-px bg-white/10" />
+          <div className="flex items-center gap-4 font-sans text-[13px] text-muted">
+            <span className="flex-1 h-px bg-line" /> or <span className="flex-1 h-px bg-line" />
           </div>
-          <Button variant="outline" onClick={() => enterDemo("You’re exploring the demo account.")} disabled={loading}>
-            <Icon name="sparkles" size={18} /> Continue with demo account
+          <Button variant="outline" onClick={() => enterDemo("You are exploring the demo workspace.")} disabled={loading}>
+            <Icon name="key" size={18} /> Use the demo workspace
           </Button>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { name: "Google", icon: "globe" },
-              { name: "Apple", icon: "smartphone" },
-            ].map((p) => (
-              <button
-                key={p.name}
-                type="button"
-                onClick={() => toast({ title: `${p.name} sign-in is a mock`, description: "Social login isn’t wired up in this demo.", variant: "info" })}
-                className="rounded-[10px] border border-white/10 hover:border-white/30 py-3 flex items-center justify-center gap-2 font-poppins text-[15px] text-white transition"
-              >
-                <Icon name={p.icon} size={18} /> {p.name}
-              </button>
-            ))}
-          </div>
+          <button
+            type="button"
+            onClick={() => toast({ title: "Passkeys are a mock here", description: "In the concept, passkeys replace passwords entirely.", variant: "info" })}
+            className="h-12 rounded-full border border-line hover:border-ink/40 flex items-center justify-center gap-2 font-sans text-[15px] text-ink transition"
+          >
+            <Icon name="fingerprint" size={18} /> Sign in with a passkey
+          </button>
         </form>
       </div>
     </Container>

@@ -23,17 +23,17 @@ const Modal = ({ open, onClose, title, children, className = "" }) => {
         if (e.target === ref.current) onClose();
       }}
     >
-      <div className={`glass bg-[#0b0f1d]/95 rounded-[24px] p-6 sm:p-8 relative ${className}`}>
+      <div className={`bg-paper border border-line rounded-card shadow-float p-6 sm:p-8 relative ${className}`}>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close dialog"
-          className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-dimWhite hover:text-white hover:bg-white/10 transition"
+          className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-muted hover:text-ink hover:bg-sand transition"
         >
           <Icon name="x" size={18} />
         </button>
         {title && (
-          <h2 id={titleId} className="font-poppins font-semibold text-[22px] text-white pr-10 mb-6">
+          <h2 id={titleId} className="font-serif text-[30px] leading-tight text-ink pr-10 mb-4">
             {title}
           </h2>
         )}

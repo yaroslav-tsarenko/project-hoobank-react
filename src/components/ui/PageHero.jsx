@@ -1,34 +1,25 @@
 import styles from "../../style";
-import Container from "./Container";
 import Breadcrumbs from "./Breadcrumbs";
+import Container from "./Container";
 
-/** Shared hero for inner pages: eyebrow, gradient-highlighted title, description, actions and optional aside. */
-const PageHero = ({ eyebrow, title, highlight, after, description, crumbs, aside, children }) => (
-  <Container as="section" className="relative pt-6 sm:pt-12 pb-10 sm:pb-16">
-    <div className="absolute inset-0 grid-bg pointer-events-none" aria-hidden="true" />
-    <div className="absolute z-[0] w-[40%] h-[40%] top-0 right-0 pink__gradient opacity-60" aria-hidden="true" />
-    <div className="absolute z-[0] w-[50%] h-[60%] left-0 bottom-0 blue__gradient" aria-hidden="true" />
-
-    <div className={`relative z-[1] flex ${aside ? "md:flex-row" : ""} flex-col gap-12 items-center`}>
-      <div className={`flex-1 flex flex-col ${aside ? "items-start" : "items-center text-center"} animate-fade-up`}>
+/**
+ * Shared hero for inner pages. `highlight` is set in italic serif — the editorial
+ * equivalent of an accent, without gradient text.
+ */
+const PageHero = ({ eyebrow, title, highlight, after, description, crumbs, aside, children, note }) => (
+  <Container as="section" className="pt-10 sm:pt-16 pb-14 sm:pb-20 border-b border-line">
+    <div className={`grid grid-cols-1 gap-12 ${aside ? "md:grid-cols-12 md:items-center" : ""}`}>
+      <div className={`flex flex-col animate-fade-up ${aside ? "md:col-span-7 items-start" : "items-start max-w-[960px]"}`}>
         {crumbs && <Breadcrumbs items={crumbs} />}
-        {eyebrow && (
-          <p className="flex flex-row items-center py-[6px] px-4 bg-discount-gradient rounded-[10px] mb-5">
-            <span className="w-2 h-2 rounded-full bg-secondary pulse-dot mr-3" aria-hidden="true" />
-            <span className={`${styles.paragraph} text-[15px] leading-[24px]`}>{eyebrow}</span>
-          </p>
-        )}
-        <h1 className={`${styles.heading1} ${aside ? "" : "max-w-[900px]"}`}>
-          {title} {highlight && <span className="text-gradient">{highlight}</span>} {after}
+        {eyebrow && <p className={`${styles.overline} mb-6`}>{eyebrow}</p>}
+        <h1 className={styles.h1}>
+          {title} {highlight && <em className="italic text-forest">{highlight}</em>} {after}
         </h1>
-        {description && (
-          <p className={`${styles.paragraph} mt-6 ${aside ? "max-w-[520px]" : "max-w-[680px]"}`}>{description}</p>
-        )}
-        {children && (
-          <div className={`flex flex-wrap gap-4 mt-10 ${aside ? "" : "justify-center"}`}>{children}</div>
-        )}
+        {description && <p className={`${styles.lead} mt-6 max-w-[600px]`}>{description}</p>}
+        {children && <div className="flex flex-wrap items-center gap-3 mt-9">{children}</div>}
+        {note && <p className="font-sans text-[13px] text-faint mt-5">{note}</p>}
       </div>
-      {aside && <div className="flex-1 w-full flex justify-center relative">{aside}</div>}
+      {aside && <div className="md:col-span-5 w-full flex justify-center md:justify-end">{aside}</div>}
     </div>
   </Container>
 );

@@ -1,43 +1,55 @@
 import { Link, useParams } from "react-router-dom";
-import { CTA } from "../components";
 import Button from "../components/Button";
+import CTA from "../components/CTA";
 import Container from "../components/ui/Container";
 import CountUp from "../components/ui/CountUp";
 import Icon from "../components/ui/Icon";
 import PageHero from "../components/ui/PageHero";
 import Reveal from "../components/ui/Reveal";
-import BudgetPlanner from "../components/widgets/BudgetPlanner";
+import SectionHeading from "../components/ui/SectionHeading";
 import CurrencyConverter from "../components/widgets/CurrencyConverter";
-import FinanceCalculator from "../components/widgets/FinanceCalculator";
-import RewardsEstimator from "../components/widgets/RewardsEstimator";
+import FeeEstimator from "../components/widgets/FeeEstimator";
+import IncomeSplit from "../components/widgets/IncomeSplit";
+import InvoicePreview from "../components/widgets/InvoicePreview";
 import SecurityCheckup from "../components/widgets/SecurityCheckup";
+import TeamSpendControls from "../components/widgets/TeamSpendControls";
 import { features, getFeature } from "../constants";
 import usePageMeta from "../hooks/usePageMeta";
 import styles from "../style";
 import NotFound from "./NotFound";
 
 const STEPS = [
-  { icon: "smartphone", title: "Open the app", text: "Sign up in minutes with just your phone and ID." },
-  { icon: "sliders", title: "Switch it on", text: "Enable the feature from your home screen in one tap." },
-  { icon: "sparkles", title: "Enjoy the upside", text: "Watch the results roll in, tracked in real time." },
+  { title: "Open a workspace", text: "ID check and business details, about ten minutes in the concept flow." },
+  { title: "Turn it on", text: "Every feature is on by default where it makes sense, and off where it should be your choice." },
+  { title: "Check the numbers", text: "Fees, rates and arrival times are shown before you confirm anything." },
 ];
 
 const Widget = ({ type }) => {
   switch (type) {
-    case "rewards":
-      return <RewardsEstimator />;
-    case "security":
-      return <SecurityCheckup />;
-    case "calculator":
-      return <FinanceCalculator defaultMode="loan" />;
     case "converter":
       return (
         <div className="max-w-[560px] mx-auto">
           <CurrencyConverter />
         </div>
       );
-    case "budget":
-      return <BudgetPlanner />;
+    case "invoice":
+      return (
+        <div className="max-w-[620px] mx-auto">
+          <InvoicePreview />
+        </div>
+      );
+    case "split":
+      return <IncomeSplit />;
+    case "team":
+      return (
+        <div className="max-w-[620px] mx-auto">
+          <TeamSpendControls />
+        </div>
+      );
+    case "fees":
+      return <FeeEstimator />;
+    case "security":
+      return <SecurityCheckup />;
     default:
       return null;
   }
@@ -52,21 +64,22 @@ const FeatureDetailContent = ({ feature }) => {
   return (
     <>
       <PageHero
-        crumbs={[{ label: "Home", to: "/" }, { label: "Features", to: "/features" }, { label: feature.title }]}
-        highlight={feature.title}
+        crumbs={[{ label: "Home", to: "/" }, { label: "Platform", to: "/features" }, { label: feature.title }]}
+        title={feature.title}
         description={feature.description}
         aside={
-          <div className={`${styles.card} p-8 w-full max-w-[460px] border-gradient`}>
-            <div className={`w-16 h-16 rounded-full ${styles.flexCenter} bg-dimBlue text-secondary mb-6`}>
-              {feature.icon ? <img src={feature.icon} alt="" className="w-8 h-8" /> : <Icon name={feature.iconName} size={30} />}
+          <div className={`${styles.card} p-7 sm:p-8 w-full max-w-[460px]`}>
+            <div className="flex items-center gap-3">
+              <span className="w-10 h-10 rounded-full border border-line text-forest flex items-center justify-center">
+                <Icon name={feature.iconName} size={20} />
+              </span>
+              <span className="font-sans text-[13px] text-brass-dark num">{String(index + 1).padStart(2, "0")} / {String(features.length).padStart(2, "0")}</span>
             </div>
-            <p className="font-poppins font-semibold text-[22px] text-white mb-6">{feature.tagline}</p>
-            <ul className="flex flex-col gap-4">
+            <p className="font-serif text-[30px] leading-[1.15] text-ink mt-6">{feature.tagline}</p>
+            <ul className="mt-6 border-t border-line">
               {feature.highlights.map((h) => (
-                <li key={h} className="flex gap-3 font-poppins text-[15px] text-dimWhite">
-                  <span className="w-6 h-6 shrink-0 rounded-full bg-blue-gradient text-primary flex items-center justify-center">
-                    <Icon name="check" size={14} strokeWidth={3} />
-                  </span>
+                <li key={h} className="flex gap-3 py-3 border-b border-line font-sans text-[15px] text-ink">
+                  <Icon name="check" size={18} className="text-forest mt-0.5" />
                   {h}
                 </li>
               ))}
@@ -74,62 +87,64 @@ const FeatureDetailContent = ({ feature }) => {
           </div>
         }
       >
-        <Button to="/signup">Get started</Button>
+        <Button to="/signup">Open an account</Button>
         <Button to="/pricing" variant="outline">
           See pricing
         </Button>
       </PageHero>
 
-      <Container className="py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <Container className="py-12">
+        <ul className="grid grid-cols-1 xs:grid-cols-3 gap-px bg-line border-y border-line">
           {feature.stats.map((s, i) => (
-            <Reveal key={s.label} delay={i * 100} className={`${styles.glassCard} p-6`}>
-              <p className="font-poppins font-semibold text-[40px] text-white">
-                <CountUp value={s.value} prefix={s.prefix} suffix={s.suffix} decimals={s.decimals ?? 0} />
+            <Reveal as="li" key={s.label} delay={i * 80} className="bg-ivory py-7 xs:px-6">
+              <p className="font-serif text-[52px] leading-none text-ink">
+                {s.display ?? <CountUp value={s.value} prefix={s.prefix} suffix={s.suffix} decimals={s.decimals ?? 0} />}
               </p>
-              <p className="font-poppins text-gradient uppercase tracking-[0.12em] text-[14px]">{s.label}</p>
+              <p className="font-sans text-[15px] text-muted mt-3">{s.label}</p>
             </Reveal>
           ))}
-        </div>
+        </ul>
       </Container>
 
       {feature.widget !== "none" && (
-        <Container className="py-12" id="try">
+        <Container className="py-16 sm:py-20" id="try">
+          <SectionHeading eyebrow="Try it" title="Works the same in the demo." description="Everything below is interactive and runs entirely in your browser." className="mb-12" />
           <Reveal>
             <Widget type={feature.widget} />
           </Reveal>
         </Container>
       )}
 
-      <Container className="py-12">
-        <h2 className={`${styles.heading2} mb-10`}>How it works</h2>
-        <ol className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {STEPS.map((s, i) => (
-            <Reveal as="li" key={s.title} delay={i * 120} className="feature-card rounded-[20px] p-6 border border-white/5">
-              <span className="font-poppins text-[14px] text-gradient font-semibold">Step {i + 1}</span>
-              <div className="flex items-center gap-3 mt-3">
-                <Icon name={s.icon} size={22} className="text-secondary" />
-                <h3 className={styles.heading4}>{s.title}</h3>
-              </div>
-              <p className="font-poppins text-dimWhite text-[15px] mt-2">{s.text}</p>
-            </Reveal>
-          ))}
-        </ol>
+      <Container className="py-16 sm:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <SectionHeading className="md:col-span-4" eyebrow="Getting started" title="Three steps." />
+          <ol className="md:col-span-8 border-t border-line">
+            {STEPS.map((s, i) => (
+              <Reveal as="li" key={s.title} delay={i * 80} className="grid grid-cols-[56px_1fr] gap-4 py-6 border-b border-line">
+                <span className="font-serif text-[36px] leading-none text-brass-dark num">{i + 1}</span>
+                <span>
+                  <span className="block font-sans font-semibold text-[17px] text-ink">{s.title}</span>
+                  <span className="block font-sans text-[15px] leading-[1.6] text-muted mt-1">{s.text}</span>
+                </span>
+              </Reveal>
+            ))}
+          </ol>
+        </div>
 
-        <nav aria-label="More features" className="flex flex-col sm:flex-row justify-between gap-4 mt-16">
-          <Link to={`/features/${prev.slug}`} className="group flex items-center gap-3 font-poppins text-dimWhite hover:text-white">
-            <Icon name="arrowLeft" size={18} className="group-hover:-translate-x-1 transition" />
+        <nav aria-label="More features" className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line rounded-card overflow-hidden mt-20">
+          <Link to={`/features/${prev.slug}`} className="group bg-ivory hover:bg-paper p-6 flex items-center gap-4 transition-colors">
+            <Icon name="arrowLeft" size={18} className="text-muted group-hover:-translate-x-1 transition" />
             <span>
-              <span className="block text-[13px]">Previous</span>
-              <span className="text-white font-medium">{prev.title}</span>
+              <span className="block font-sans text-[13px] text-muted">Previous</span>
+              <span className="block font-serif text-[26px] leading-tight text-ink">{prev.title}</span>
             </span>
           </Link>
-          <Link to={`/features/${next.slug}`} className="group flex items-center gap-3 font-poppins text-dimWhite hover:text-white sm:text-right">
+          <Link to={`/features/${next.slug}`} className="group bg-ivory hover:bg-paper p-6 flex items-center justify-end gap-4 text-right transition-colors">
             <span>
-              <span className="block text-[13px]">Next</span>
-              <span className="text-white font-medium">{next.title}</span>
+              <span className="block font-sans text-[13px] text-muted">Next</span>
+              <span className="block font-serif text-[26px] leading-tight text-ink">{next.title}</span>
             </span>
-            <Icon name="arrowRight" size={18} className="group-hover:translate-x-1 transition" />
+            <Icon name="arrowRight" size={18} className="text-muted group-hover:translate-x-1 transition" />
           </Link>
         </nav>
         <CTA />

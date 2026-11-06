@@ -1,11 +1,13 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { logo, people01 } from "../assets";
 import SendMoneyModal from "../components/dashboard/SendMoneyModal";
+import Avatar from "../components/ui/Avatar";
 import Icon from "../components/ui/Icon";
+import Logo from "../components/ui/Logo";
 import PageLoader from "../components/ui/PageLoader";
 import { initialBalance, initialTransactions } from "../constants/dashboard";
 import { useToast } from "../context/ToastContext";
+import { usd } from "../lib/format";
 import styles from "../style";
 
 const localISODate = () => {
@@ -21,9 +23,9 @@ const NAV = [
 ];
 
 const NOTIFICATIONS = [
-  { id: "n1", icon: "briefcase", text: "Salary of $4,850.00 received", time: "2d ago" },
-  { id: "n2", icon: "shieldCheck", text: "New sign-in from MacBook Pro", time: "3d ago" },
-  { id: "n3", icon: "sparkles", text: "You earned 412 HooPoints this month", time: "5d ago" },
+  { id: "n1", icon: "arrowDownLeft", text: "Halden Studio paid INV-0142 ($6,400.00)", time: "2 days ago" },
+  { id: "n2", icon: "shieldCheck", text: "New sign-in approved on MacBook Air", time: "3 days ago" },
+  { id: "n3", icon: "fileText", text: "INV-0143 to Kestrel Audio is overdue", time: "5 days ago" },
 ];
 
 const Notifications = () => {
@@ -52,32 +54,32 @@ const Notifications = () => {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-label={`Notifications${unread ? ` (${unread} unread)` : ""}`}
-        className="relative w-11 h-11 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition"
+        className="relative w-10 h-10 rounded-full border border-line bg-paper hover:border-ink/40 text-ink flex items-center justify-center transition"
       >
-        <Icon name="bell" size={20} />
+        <Icon name="bell" size={18} />
         {unread > 0 && (
-          <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] rounded-full bg-accentPink text-primary text-[11px] font-poppins font-semibold flex items-center justify-center px-1">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-brass text-ink text-[11px] font-sans font-semibold flex items-center justify-center px-1">
             {unread}
           </span>
         )}
       </button>
       {open && (
-        <div className="absolute right-0 mt-3 w-[min(320px,calc(100vw-32px))] glass bg-[#0b0f1d]/95 rounded-[20px] p-4 shadow-2xl z-50 animate-fade-up">
-          <div className="flex items-center justify-between mb-3">
-            <p className="font-poppins font-semibold text-white">Notifications</p>
-            <button type="button" onClick={() => setUnread(0)} className="font-poppins text-[13px] text-secondary hover:underline">
+        <div className="absolute right-0 mt-2 w-[min(340px,calc(100vw-32px))] bg-paper border border-line rounded-card p-2 shadow-float z-50 animate-fade-up">
+          <div className="flex items-center justify-between px-3 py-2">
+            <p className="font-sans font-semibold text-ink text-[14px]">Notifications</p>
+            <button type="button" onClick={() => setUnread(0)} className="font-sans text-[13px] text-forest link">
               Mark all read
             </button>
           </div>
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col">
             {NOTIFICATIONS.map((n, i) => (
-              <li key={n.id} className={`flex gap-3 rounded-[12px] p-3 ${i < unread ? "bg-white/5" : ""}`}>
-                <span className="w-9 h-9 rounded-full bg-dimBlue text-secondary flex items-center justify-center">
-                  <Icon name={n.icon} size={16} />
+              <li key={n.id} className={`flex gap-3 rounded-control p-3 ${i < unread ? "bg-forest-50" : ""}`}>
+                <span className="w-8 h-8 rounded-full bg-paper border border-line text-forest flex items-center justify-center">
+                  <Icon name={n.icon} size={15} />
                 </span>
                 <span className="flex-1">
-                  <span className="block font-poppins text-[14px] text-white">{n.text}</span>
-                  <span className="block font-poppins text-[12px] text-dimWhite">{n.time}</span>
+                  <span className="block font-sans text-[14px] text-ink leading-snug">{n.text}</span>
+                  <span className="block font-sans text-[12px] text-muted mt-0.5">{n.time}</span>
                 </span>
               </li>
             ))}
@@ -89,7 +91,9 @@ const Notifications = () => {
 };
 
 const sideLink = ({ isActive }) =>
-  `flex items-center gap-3 rounded-[14px] px-4 py-3 font-poppins text-[15px] transition ${isActive ? "bg-blue-gradient text-primary font-medium shadow-[0_10px_30px_-12px_rgba(92,225,230,0.6)]" : "text-dimWhite hover:text-white hover:bg-white/5"}`;
+  `relative flex items-center gap-3 rounded-control px-3 py-2.5 font-sans text-[15px] transition ${isActive ? "bg-forest-50 text-forest font-medium before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[2px] before:bg-forest" : "text-muted hover:text-ink hover:bg-sand/60"}`;
+
+const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
 /** Mock banking app shell: sidebar (desktop) / bottom tabs (mobile), header, shared demo state via Outlet context. */
 const DashboardLayout = () => {
@@ -102,71 +106,70 @@ const DashboardLayout = () => {
   const [sendOpen, setSendOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const onSend = useCallback(({ recipient, amount, note }) => {
-    setBalance((b) => b - amount);
-    setTransactions((list) => [
-      { id: `t-${Date.now()}`, name: recipient.name, category: "transfer", amount: -amount, date: localISODate(), note, fresh: true },
-      ...list,
-    ]);
-    toast({ title: "Transfer complete", description: `${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount)} sent to ${recipient.name}.` });
-  }, [toast]);
-
-  const ctx = useMemo(
-    () => ({ balance, transactions, hidden, setHidden, openSend: () => setSendOpen(true), setBalance, setTransactions }),
-    [balance, transactions, hidden]
+  const onSend = useCallback(
+    ({ recipient, amount, note }) => {
+      setBalance((b) => b - amount);
+      setTransactions((list) => [{ id: `t-${Date.now()}`, name: recipient.name, category: "transfer", amount: -amount, date: localISODate(), note, fresh: true }, ...list]);
+      toast({ title: "Transfer sent", description: `${usd(amount)} to ${recipient.name}. (Demo — no money moved.)` });
+    },
+    [toast]
   );
 
+  const ctx = useMemo(() => ({ balance, transactions, hidden, setHidden, openSend: () => setSendOpen(true), setBalance, setTransactions }), [balance, transactions, hidden]);
+
   const logout = () => {
-    toast({ title: "Signed out", description: "See you soon! (Demo session ended.)", variant: "info" });
+    toast({ title: "Signed out", description: "Demo session ended.", variant: "info" });
     navigate("/login");
   };
 
-  const title = NAV.find((n) => (n.end ? location.pathname === n.to : location.pathname.startsWith(n.to)))?.label ?? "Dashboard";
+  const title = NAV.find((n) => (n.end ? location.pathname === n.to : location.pathname.startsWith(n.to)))?.label ?? "Workspace";
 
   return (
-    <div className="min-h-screen bg-primary flex overflow-x-clip">
-      <aside className="hidden md:flex flex-col w-[260px] shrink-0 h-screen sticky top-0 border-r border-white/5 bg-[#03060f] p-6">
-        <Link to="/" aria-label="HooBank home">
-          <img src={logo} alt="HooBank" className="w-[124px] h-[32px]" />
+    <div className="min-h-screen bg-ivory flex overflow-x-clip">
+      <div className="hidden md:block w-[248px] shrink-0 border-r border-line bg-paper">
+      <aside className="flex flex-col h-screen sticky top-0 px-4 py-6">
+        <Link to="/" aria-label="Northvault home" className="px-2">
+          <Logo size={26} />
         </Link>
-        <nav aria-label="Dashboard" className="flex flex-col gap-1 mt-10">
+        <div className="mt-8 mx-1 rounded-control border border-line px-3 py-2.5">
+          <p className="font-sans text-[12px] text-muted">Workspace</p>
+          <p className="font-sans font-medium text-[14px] text-ink">Morgan Studio · Studio plan</p>
+        </div>
+        <nav aria-label="Workspace" className="flex flex-col gap-0.5 mt-6">
           {NAV.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={sideLink}>
               <Icon name={n.icon} size={18} /> {n.label}
             </NavLink>
           ))}
         </nav>
-        <div className="mt-auto flex flex-col gap-4">
-          <div className="rounded-[20px] bg-black-gradient p-5 border border-white/5 relative overflow-hidden">
-            <div className="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-secondary/20 blur-2xl" aria-hidden="true" />
-            <p className="font-poppins font-semibold text-white">Go Premium</p>
-            <p className="font-poppins text-[13px] text-dimWhite mt-1">5% cash back on travel & lounge access.</p>
-            <Link to="/pricing" className="inline-block mt-3 font-poppins text-[13px] text-secondary hover:underline">
-              Compare plans →
-            </Link>
+        <div className="mt-auto flex flex-col gap-1">
+          <div className="rounded-control bg-sand/70 p-4 mb-3">
+            <p className="font-sans font-semibold text-[14px] text-ink">Concept demo</p>
+            <p className="font-sans text-[13px] leading-[1.5] text-muted mt-1">Balances and transfers are simulated in your browser.</p>
           </div>
-          <Link to="/" className="flex items-center gap-3 px-4 py-2 font-poppins text-[14px] text-dimWhite hover:text-white">
+          <Link to="/" className="flex items-center gap-3 px-3 py-2 font-sans text-[14px] text-muted hover:text-ink">
             <Icon name="arrowLeft" size={16} /> Back to website
           </Link>
-          <button type="button" onClick={logout} className="flex items-center gap-3 px-4 py-2 font-poppins text-[14px] text-dimWhite hover:text-white">
+          <button type="button" onClick={logout} className="flex items-center gap-3 px-3 py-2 font-sans text-[14px] text-muted hover:text-ink">
             <Icon name="logOut" size={16} /> Log out
           </button>
         </div>
       </aside>
+      </div>
 
       <div className="flex-1 min-w-0 flex flex-col">
-        <header className="sticky top-0 z-40 bg-primary/80 backdrop-blur-xl border-b border-white/5">
-          <div className="flex items-center gap-4 px-4 sm:px-8 py-4">
-            <Link to="/" aria-label="HooBank home" className="md:hidden shrink-0">
-              <img src={logo} alt="HooBank" className="w-[100px] h-[26px]" />
+        <header className="sticky top-0 z-40 bg-ivory/95 backdrop-blur-sm border-b border-line">
+          <div className="flex items-center gap-4 px-4 sm:px-8 h-[72px]">
+            <Link to="/" aria-label="Northvault home" className="md:hidden shrink-0">
+              <Logo size={24} />
             </Link>
             <div className="hidden md:block">
-              <p className="font-poppins text-[13px] text-dimWhite">Good to see you, Alex 👋</p>
-              <h1 className="font-poppins font-semibold text-[22px] text-white">{title}</h1>
+              <p className="font-sans text-[13px] text-muted">{today}</p>
+              <h1 className="font-serif text-[30px] leading-none text-ink mt-1">{title}</h1>
             </div>
             <form
               role="search"
-              className="hidden sm:block flex-1 max-w-[360px] ml-auto relative"
+              className="hidden sm:block flex-1 max-w-[340px] ml-auto relative"
               onSubmit={(e) => {
                 e.preventDefault();
                 navigate(`/dashboard/transactions${search.trim() ? `?q=${encodeURIComponent(search.trim())}` : ""}`);
@@ -175,43 +178,43 @@ const DashboardLayout = () => {
               <label htmlFor="dash-search" className="sr-only">
                 Search transactions
               </label>
-              <Icon name="search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-dimWhite" />
-              <input id="dash-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search transactions…" className={`${styles.input} pl-11 py-2.5 rounded-full`} />
+              <Icon name="search" size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+              <input id="dash-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search transactions" className={`${styles.input} pl-10 py-2 rounded-full`} />
             </form>
-            <div className="flex items-center gap-3 ml-auto sm:ml-0">
-              <button type="button" onClick={() => setSendOpen(true)} className="hidden xs:flex items-center gap-2 rounded-full bg-blue-gradient text-primary font-poppins font-medium text-[14px] px-4 py-2.5 btn-glow">
+            <div className="flex items-center gap-2.5 ml-auto sm:ml-0">
+              <button type="button" onClick={() => setSendOpen(true)} className="hidden xs:flex items-center gap-2 h-10 rounded-full bg-forest text-ivory font-sans font-medium text-[14px] px-4 hover:bg-forest-700 transition-colors">
                 <Icon name="send" size={16} /> Send
               </button>
               <Notifications />
               <Link to="/dashboard/settings" aria-label="Profile settings">
-                <img src={people01} alt="" className="w-11 h-11 rounded-full border-2 border-secondary/40" />
+                <Avatar name="Alex Morgan" />
               </Link>
             </div>
           </div>
         </header>
 
-        <main id="main" className="flex-1 px-4 sm:px-8 py-6 sm:py-8 pb-28 md:pb-10">
-          <h1 className="md:hidden font-poppins font-semibold text-[24px] text-white mb-5">{title}</h1>
+        <main id="main" className="flex-1 px-4 sm:px-8 py-6 sm:py-8 pb-28 md:pb-12">
+          <h1 className="md:hidden font-serif text-[34px] leading-none text-ink mb-6">{title}</h1>
           <Suspense fallback={<PageLoader />}>
             <Outlet context={ctx} />
           </Suspense>
         </main>
       </div>
 
-      <nav aria-label="Dashboard" className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#03060f]/95 backdrop-blur-xl border-t border-white/10 grid grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)]">
+      <nav aria-label="Workspace" className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-paper border-t border-line grid grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)]">
         {NAV.slice(0, 2).map((n) => (
-          <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `flex flex-col items-center gap-1 py-3 font-poppins text-[11px] ${isActive ? "text-secondary" : "text-dimWhite"}`}>
+          <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `flex flex-col items-center gap-1 py-3 font-sans text-[11px] ${isActive ? "text-forest font-medium" : "text-muted"}`}>
             <Icon name={n.icon} size={20} /> {n.label}
           </NavLink>
         ))}
-        <button type="button" onClick={() => setSendOpen(true)} className="flex flex-col items-center gap-1 py-2 font-poppins text-[11px] text-white" aria-label="Send money">
-          <span className="w-11 h-11 -mt-6 rounded-full bg-blue-gradient text-primary flex items-center justify-center shadow-[0_10px_30px_-8px_rgba(92,225,230,0.7)]">
+        <button type="button" onClick={() => setSendOpen(true)} className="flex flex-col items-center gap-1 py-2 font-sans text-[11px] text-ink" aria-label="Send money">
+          <span className="w-11 h-11 -mt-6 rounded-full bg-forest text-ivory flex items-center justify-center shadow-float">
             <Icon name="send" size={20} />
           </span>
           Send
         </button>
         {NAV.slice(2).map((n) => (
-          <NavLink key={n.to} to={n.to} className={({ isActive }) => `flex flex-col items-center gap-1 py-3 font-poppins text-[11px] ${isActive ? "text-secondary" : "text-dimWhite"}`}>
+          <NavLink key={n.to} to={n.to} className={({ isActive }) => `flex flex-col items-center gap-1 py-3 font-sans text-[11px] ${isActive ? "text-forest font-medium" : "text-muted"}`}>
             <Icon name={n.icon} size={20} /> {n.label}
           </NavLink>
         ))}

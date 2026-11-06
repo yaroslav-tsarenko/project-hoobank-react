@@ -1,101 +1,119 @@
-import { CTA } from "../components";
 import Button from "../components/Button";
+import CTA from "../components/CTA";
 import Container from "../components/ui/Container";
 import Icon from "../components/ui/Icon";
+import { LogoMark } from "../components/ui/Logo";
 import PageHero from "../components/ui/PageHero";
 import Reveal from "../components/ui/Reveal";
 import SectionHeading from "../components/ui/SectionHeading";
 import SecurityCheckup from "../components/widgets/SecurityCheckup";
-import { shield } from "../assets";
 import usePageMeta from "../hooks/usePageMeta";
 import styles from "../style";
 
 const LAYERS = [
-  { icon: "lock", title: "Encryption everywhere", text: "256-bit AES at rest and TLS 1.3 in transit for every byte of data." },
-  { icon: "fingerprint", title: "Biometric sign-in", text: "Face ID, fingerprint and device binding keep strangers out." },
-  { icon: "zap", title: "Real-time fraud scoring", text: "Every transaction is scored in milliseconds against hundreds of signals." },
-  { icon: "snowflake", title: "One-tap freeze", text: "Lost your card? Freeze and unfreeze it instantly from the app." },
-  { icon: "card", title: "Virtual cards", text: "Disposable card numbers for online shopping and subscriptions." },
-  { icon: "bell", title: "Instant alerts", text: "Know about every payment the second it happens." },
+  { icon: "key", title: "Passkeys, not passwords", text: "Sign-in uses keys bound to your devices. There is no SMS code to intercept or password to reuse." },
+  { icon: "smartphone", title: "Trusted devices", text: "A new phone or laptop must be approved from one you already use." },
+  { icon: "users", title: "Confirmation for new payees", text: "The first payment to anyone new needs a second step, which stops most invoice-redirection fraud." },
+  { icon: "lock", title: "Approvals over a threshold", text: "Large transfers wait for a second confirmation, from you or from someone else on the team." },
+  { icon: "snowflake", title: "Freeze in one step", text: "Freeze and unfreeze any card from the app; virtual cards can be locked to a single merchant." },
+  { icon: "list", title: "A complete audit log", text: "Every sign-in, change and approval is recorded and can be exported." },
 ];
 
-const BADGES = ["PCI DSS Level 1", "SOC 2 Type II", "GDPR compliant", "ISO 27001"];
+const PRACTICES = [
+  "Encryption in transit (TLS 1.3) and at rest",
+  "Least-privilege access for staff, reviewed quarterly",
+  "Independent penetration testing before launch",
+  "A public responsible-disclosure policy",
+];
 
 const Security = () => {
-  usePageMeta("Security", "How HooBank keeps your money and data safe: encryption, biometric sign-in, real-time fraud scoring and instant card freeze.");
+  usePageMeta("Security", "How Northvault is designed to protect business money: passkeys, trusted devices, payee confirmation, approvals and an audit log.");
   return (
     <>
       <PageHero
-        eyebrow="100% Secured"
-        title="Your money,"
-        highlight="locked down."
-        description="Multiple layers of protection work quietly in the background so you can spend, save and send with total peace of mind."
+        eyebrow="Security"
+        title="Protection that stays"
+        highlight="out of the way."
+        description="Most fraud against small businesses is a convincing request to pay the wrong account. Northvault is designed to catch that moment without slowing down everything else."
         aside={
-          <div className="relative w-[260px] h-[260px] xs:w-[320px] xs:h-[320px] flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border border-secondary/20 motion-safe:animate-[spin_30s_linear_infinite]" style={{ borderStyle: "dashed" }} />
-            <div className="absolute inset-8 rounded-full border border-white/10" />
-            <div className="absolute inset-16 rounded-full bg-dimBlue pulse-dot" />
-            <img src={shield} alt="" className="relative w-24 h-24 motion-safe:animate-float" />
-            {["lock", "fingerprint", "key", "bell"].map((ic, i) => (
-              <span
-                key={ic}
-                className="absolute w-12 h-12 rounded-full glass flex items-center justify-center text-secondary"
-                style={{ top: `${50 - 46 * Math.cos((i * Math.PI) / 2)}%`, left: `${50 + 46 * Math.sin((i * Math.PI) / 2)}%`, transform: "translate(-50%, -50%)" }}
-              >
-                <Icon name={ic} size={20} />
+          <div className={`${styles.card} w-full max-w-[420px] p-7 sm:p-8`}>
+            <div className="flex items-center gap-3">
+              <LogoMark size={32} />
+              <p className="font-sans font-semibold text-[15px] text-ink">Confirm new payee</p>
+            </div>
+            <p className="font-serif text-[30px] leading-tight text-ink mt-6">Paying Kestrel Audio Ltd for the first time</p>
+            <dl className="mt-6 border-t border-line font-sans text-[14px]">
+              {[
+                ["Account name", "Kestrel Audio Ltd"],
+                ["Name check", "Matches the account"],
+                ["Amount", "$2,600.00"],
+              ].map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-4 py-2.5 border-b border-line">
+                  <dt className="text-muted">{k}</dt>
+                  <dd className={`text-right ${k === "Name check" ? "text-positive font-medium" : "text-ink"} num`}>{v}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="grid grid-cols-2 gap-2 mt-6" aria-hidden="true">
+              <span className="h-10 rounded-full border border-line flex items-center justify-center font-sans text-[14px] text-ink">Cancel</span>
+              <span className="h-10 rounded-full bg-forest flex items-center justify-center font-sans text-[14px] text-ivory gap-2">
+                <Icon name="fingerprint" size={16} /> Confirm
               </span>
-            ))}
+            </div>
           </div>
         }
       >
-        <Button to="#checkup">Run a security checkup</Button>
+        <Button to="#checkup">Check your settings</Button>
         <Button to="/help" variant="outline">
-          Security FAQ
+          Security questions
         </Button>
       </PageHero>
 
-      <Container className="py-16">
-        <SectionHeading eyebrow="Defence in depth" title="Six layers between you and fraud" className="mb-12" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Container className="py-16 sm:py-24">
+        <SectionHeading index="01" eyebrow="Defence in layers" title="Six controls between you and a bad payment." className="mb-12" />
+        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-line border border-line rounded-card overflow-hidden">
           {LAYERS.map((l, i) => (
-            <Reveal key={l.title} delay={(i % 3) * 100} className="feature-card rounded-[20px] p-6 border border-white/5">
-              <span className={`w-14 h-14 rounded-full ${styles.flexCenter} bg-dimBlue text-secondary`}>
-                <Icon name={l.icon} size={24} />
-              </span>
-              <h3 className={`${styles.heading4} mt-5`}>{l.title}</h3>
-              <p className="font-poppins text-dimWhite text-[15px] mt-2">{l.text}</p>
+            <Reveal as="li" key={l.title} delay={(i % 3) * 80} className="bg-ivory p-6 sm:p-8">
+              <Icon name={l.icon} size={22} className="text-forest" />
+              <h3 className="font-serif text-[28px] leading-[1.1] text-ink mt-8">{l.title}</h3>
+              <p className="font-sans text-[15px] leading-[1.6] text-muted mt-3">{l.text}</p>
             </Reveal>
           ))}
-        </div>
+        </ul>
       </Container>
 
-      <Container id="checkup" className="py-16">
-        <SectionHeading eyebrow="Interactive" title="How protected are you?" description="Flip the switches to see how each setting raises your protection score." className="mb-10" />
+      <Container id="checkup" className="py-16 sm:py-24 border-t border-line">
+        <SectionHeading index="02" eyebrow="Interactive" title="How protected is your setup?" description="Switch controls on and off to see how each one changes the score." className="mb-12" />
         <Reveal>
           <SecurityCheckup />
         </Reveal>
       </Container>
 
-      <Container className="py-16">
-        <Reveal className={`${styles.card} p-8 sm:p-12 flex flex-col md:flex-row gap-10 items-start md:items-center`}>
-          <div className="flex-1">
-            <h2 className={styles.heading3}>Certified and audited</h2>
-            <p className={`${styles.paragraph} mt-3 max-w-[520px]`}>
-              Independent auditors review our controls every year. Found a vulnerability? Our bug bounty pays up to $10,000.
-            </p>
-            <Button to="/contact?topic=security" variant="outline" size="sm" className="mt-6">
-              Report a vulnerability
+      <Container className="py-16 sm:py-24 border-t border-line">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <SectionHeading
+            className="md:col-span-5"
+            index="03"
+            eyebrow="Practices"
+            title="What a launch would require."
+            description="Northvault is a concept, so it holds no certifications. These are the practices the product is designed around, and what a real launch with a licensed partner would need to evidence."
+          >
+            <Button to="/contact?topic=security" variant="outline" size="sm" className="mt-8">
+              Report a security issue
             </Button>
-          </div>
-          <ul className="grid grid-cols-2 gap-3 w-full md:w-auto">
-            {BADGES.map((b) => (
-              <li key={b} className="rounded-[14px] border border-white/10 px-4 py-3 font-poppins text-[14px] text-white flex items-center gap-2">
-                <Icon name="shieldCheck" size={18} className="text-secondary" /> {b}
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-        <CTA title="Bank with confidence." />
+          </SectionHeading>
+          <Reveal className="md:col-span-7">
+            <ul className="border-t border-line">
+              {PRACTICES.map((p, i) => (
+                <li key={p} className="grid grid-cols-[48px_1fr] gap-4 py-5 border-b border-line">
+                  <span className="font-serif text-[28px] leading-none text-brass-dark num">{i + 1}</span>
+                  <span className="font-sans text-[17px] text-ink">{p}</span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+        <CTA title="Calm, by design." text="See how the controls feel in the demo workspace." primary={{ to: "/dashboard", label: "Open the demo" }} secondary={{ to: "/signup", label: "Open an account" }} />
       </Container>
     </>
   );

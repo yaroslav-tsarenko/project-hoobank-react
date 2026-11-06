@@ -9,7 +9,7 @@ const Field = ({ label, error, hint, as = "input", className = "", children, rig
     id,
     "aria-invalid": error ? true : undefined,
     "aria-describedby": describedBy,
-    className: `${styles.input} ${right ? "pr-12" : ""}`,
+    className: `${styles.input} ${right ? "pr-12" : ""} ${as === "select" ? "cursor-pointer" : ""}`,
     ...props,
   };
 
@@ -25,14 +25,14 @@ const Field = ({ label, error, hint, as = "input", className = "", children, rig
       </label>
       <div className="relative">
         {control}
-        {right && <div className="absolute inset-y-0 right-2 flex items-center">{right}</div>}
+        {right && <div className="absolute inset-y-0 right-1.5 flex items-center">{right}</div>}
       </div>
       {error ? (
-        <p id={`${id}-error`} className="font-poppins text-[13px] text-red-300 mt-2">
+        <p id={`${id}-error`} className="font-sans text-[13px] text-negative mt-1.5">
           {error}
         </p>
       ) : hint ? (
-        <p id={`${id}-hint`} className="font-poppins text-[13px] text-dimWhite mt-2">
+        <p id={`${id}-hint`} className="font-sans text-[13px] text-faint mt-1.5">
           {hint}
         </p>
       ) : null}

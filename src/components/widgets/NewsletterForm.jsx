@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useToast } from "../../context/ToastContext";
-import styles from "../../style";
 import Icon from "../ui/Icon";
 
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-/** Newsletter sign-up (mock) — validates and confirms with a toast. */
-const NewsletterForm = ({ className = "" }) => {
+/** Newsletter sign-up (mock) — validates and confirms with a toast. `tone="dark"` for forest backgrounds. */
+const NewsletterForm = ({ className = "", tone = "light", title = "The Northvault letter", text = "One email a month on tax, currencies and getting paid. No promotions." }) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const toast = useToast();
+  const id = useId();
+  const dark = tone === "dark";
 
   const submit = (e) => {
     e.preventDefault();
@@ -19,32 +20,36 @@ const NewsletterForm = ({ className = "" }) => {
     }
     setError("");
     setEmail("");
-    toast({ title: "You're on the list!", description: `We'll send money tips to ${email} twice a month.` });
+    toast({ title: "You are on the list", description: `The next letter goes to ${email}. (Demo — nothing was sent.)` });
   };
 
   return (
     <form onSubmit={submit} noValidate className={className}>
-      <label htmlFor="newsletter-email" className="font-poppins font-medium text-[18px] leading-[27px] text-white block">
-        Newsletter
+      <label htmlFor={id} className={`font-serif text-[24px] leading-tight block ${dark ? "text-ivory" : "text-ink"}`}>
+        {title}
       </label>
-      <p className="font-poppins text-[14px] text-dimWhite mt-2 mb-4">Money tips and product news. No spam, ever.</p>
-      <div className="flex gap-2">
+      <p className={`font-sans text-[14px] leading-[1.55] mt-2 mb-4 ${dark ? "text-ivory/75" : "text-muted"}`}>{text}</p>
+      <div className={`flex items-center gap-2 border-b pb-2 ${dark ? "border-ivory/30 focus-within:border-ivory" : "border-ink/30 focus-within:border-ink"}`}>
         <input
-          id="newsletter-email"
+          id={id}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder="you@studio.com"
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? "newsletter-error" : undefined}
-          className={`${styles.input} py-2.5 min-w-0`}
+          aria-describedby={error ? `${id}-error` : undefined}
+          className={`flex-1 min-w-0 bg-transparent outline-none font-sans text-[16px] py-1.5 ${dark ? "text-ivory placeholder:text-ivory/50" : "text-ink placeholder:text-faint"}`}
         />
-        <button type="submit" aria-label="Subscribe to newsletter" className="shrink-0 w-12 rounded-[10px] bg-blue-gradient text-primary flex items-center justify-center btn-glow">
-          <Icon name="send" size={18} />
+        <button
+          type="submit"
+          aria-label="Subscribe"
+          className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition ${dark ? "bg-ivory text-forest hover:bg-paper" : "bg-forest text-ivory hover:bg-forest-700"}`}
+        >
+          <Icon name="arrowRight" size={16} strokeWidth={2} />
         </button>
       </div>
       {error && (
-        <p id="newsletter-error" className="font-poppins text-[13px] text-red-300 mt-2">
+        <p id={`${id}-error`} className={`font-sans text-[13px] mt-2 ${dark ? "text-brass-light" : "text-negative"}`}>
           {error}
         </p>
       )}

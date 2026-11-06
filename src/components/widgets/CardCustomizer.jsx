@@ -8,9 +8,9 @@ import Button from "../Button";
 import CreditCard from "../ui/CreditCard";
 import Icon from "../ui/Icon";
 
-export const CARD_STORAGE_KEY = "hoobank.card-design";
+export const CARD_STORAGE_KEY = "northvault.card-design";
 
-/** Card Studio: colour / finish / name / tier with live 3D preview, flip and save (localStorage). */
+/** Card designer: material / finish / name / plan label with live preview, flip and save (localStorage). */
 const CardCustomizer = () => {
   const [saved, setSaved] = useLocalStorage(CARD_STORAGE_KEY, defaultCardDesign);
   const [design, setDesign] = useState(saved);
@@ -19,7 +19,7 @@ const CardCustomizer = () => {
 
   const update = (patch) => setDesign((d) => ({ ...d, ...patch }));
 
-  const surprise = () => {
+  const shuffle = () => {
     const color = cardColors[Math.floor(Math.random() * cardColors.length)].id;
     const finish = cardFinishes[Math.floor(Math.random() * cardFinishes.length)].id;
     update({ color, finish });
@@ -27,64 +27,66 @@ const CardCustomizer = () => {
 
   const save = () => {
     setSaved(design);
-    toast({ title: "Design saved", description: "Your card now appears in the demo dashboard → Cards." });
+    toast({ title: "Design saved", description: "It now appears on the Cards page of the demo workspace." });
   };
 
   const dirty = JSON.stringify(saved) !== JSON.stringify(design);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-10 items-center">
-      <div className="relative flex flex-col items-center">
-        <div className="absolute w-[70%] h-[60%] blue__gradient" aria-hidden="true" />
-        <div className="absolute w-[40%] h-[40%] right-0 top-0 pink__gradient opacity-70" aria-hidden="true" />
-        <div className="relative w-full max-w-[460px] motion-safe:animate-float">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div className="md:col-span-7 rounded-card bg-sand/70 border border-line flex flex-col items-center justify-center px-6 py-12 sm:py-16">
+        <div className="w-full max-w-[440px]">
           <CreditCard design={design} flipped={flipped} />
         </div>
-        <p className="font-poppins text-[13px] text-dimWhite mt-6 flex items-center gap-2">
-          <Icon name="sparkles" size={14} className="text-secondary" /> Move your cursor over the card to tilt it
-        </p>
-        <div className="flex flex-wrap justify-center gap-3 mt-4">
+        <div className="w-full max-w-[440px] h-3 mt-6 rounded-[50%] bg-ink/10 blur-md" aria-hidden="true" />
+        <div className="flex flex-wrap justify-center gap-2 mt-6">
           <Button variant="outline" size="sm" onClick={() => setFlipped((f) => !f)} aria-pressed={flipped}>
-            <Icon name="rotate" size={16} /> {flipped ? "Show front" : "Flip card"}
+            <Icon name="rotate" size={16} /> {flipped ? "Show front" : "Show back"}
           </Button>
-          <Button variant="ghost" size="sm" onClick={surprise}>
-            <Icon name="sparkles" size={16} /> Surprise me
+          <Button variant="ghost" size="sm" onClick={shuffle}>
+            <Icon name="repeat" size={16} /> Shuffle material
           </Button>
         </div>
+        <p className="font-sans text-[13px] text-muted mt-4">Move the pointer over the card to see the light change.</p>
       </div>
 
-      <div className={`${styles.card} p-6 sm:p-8 flex flex-col gap-7`}>
+      <div className={`md:col-span-5 ${styles.card} p-6 sm:p-7 flex flex-col gap-7`}>
         <fieldset>
-          <legend className={styles.label}>Colour</legend>
-          <div className="flex flex-wrap gap-3">
+          <legend className={styles.label}>Material</legend>
+          <div className="grid grid-cols-3 gap-2">
             {cardColors.map((c) => (
               <button
                 key={c.id}
                 type="button"
                 onClick={() => update({ color: c.id })}
                 aria-pressed={design.color === c.id}
-                aria-label={c.name}
-                title={c.name}
-                className={`w-11 h-11 rounded-full transition ring-offset-2 ring-offset-[#11101d] ${design.color === c.id ? "ring-2 ring-secondary scale-110" : "hover:scale-105"}`}
-                style={{ background: c.background }}
-              />
+                className={`rounded-control border p-2 text-left transition ${design.color === c.id ? "border-forest ring-1 ring-forest" : "border-line hover:border-ink/40"}`}
+              >
+                <span className="block h-8 rounded-[5px]" style={{ background: c.background }} />
+                <span className="block font-sans text-[13px] text-ink mt-1.5">{c.name}</span>
+              </button>
             ))}
           </div>
         </fieldset>
 
         <fieldset>
           <legend className={styles.label}>Finish</legend>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="border-t border-line">
             {cardFinishes.map((f) => (
               <button
                 key={f.id}
                 type="button"
                 onClick={() => update({ finish: f.id })}
                 aria-pressed={design.finish === f.id}
-                className={`text-left rounded-[14px] border p-3 transition ${design.finish === f.id ? "border-secondary/70 bg-white/5" : "border-white/10 hover:border-white/30"}`}
+                className="w-full flex items-center gap-3 py-2.5 border-b border-line text-left group"
               >
-                <span className="block font-poppins font-medium text-[15px] text-white">{f.name}</span>
-                <span className="block font-poppins text-[12px] leading-[18px] text-dimWhite mt-1">{f.description}</span>
+                <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${design.finish === f.id ? "border-forest" : "border-ink/30 group-hover:border-ink/60"}`}>
+                  {design.finish === f.id && <span className="w-2 h-2 rounded-full bg-forest" />}
+                </span>
+                <span className="flex-1">
+                  <span className="block font-sans font-medium text-[14px] text-ink">{f.name}</span>
+                  <span className="block font-sans text-[13px] text-muted">{f.description}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -98,39 +100,33 @@ const CardCustomizer = () => {
             id="card-name"
             value={design.name}
             maxLength={22}
-            onChange={(e) => update({ name: e.target.value.replace(/[^a-zA-Z .'-]/g, "") })}
+            onChange={(e) => update({ name: e.target.value.replace(/[^a-zA-ZÀ-ÿ .'-]/g, "") })}
             className={styles.input}
             placeholder="Your name"
             aria-describedby="card-name-hint"
           />
-          <p id="card-name-hint" className="font-poppins text-[12px] text-dimWhite mt-2">
+          <p id="card-name-hint" className="font-sans text-[13px] text-faint mt-1.5 num">
             {22 - design.name.length} characters left · letters only
           </p>
         </div>
 
         <fieldset>
-          <legend className={styles.label}>Tier label</legend>
+          <legend className={styles.label}>Plan label</legend>
           <div className="flex flex-wrap gap-2">
-            {["Classic", "Plus", "Premium"].map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => update({ tier: t })}
-                aria-pressed={design.tier === t}
-                className={`${styles.chip} ${design.tier === t ? styles.chipActive : styles.chipIdle}`}
-              >
+            {["Solo", "Studio", "Team"].map((t) => (
+              <button key={t} type="button" onClick={() => update({ tier: t })} aria-pressed={design.tier === t} className={`${styles.chip} ${design.tier === t ? styles.chipActive : styles.chipIdle}`}>
                 {t}
               </button>
             ))}
           </div>
         </fieldset>
 
-        <div className="flex flex-wrap items-center gap-3 pt-2">
+        <div className="flex flex-wrap items-center gap-4 pt-1">
           <Button onClick={save} disabled={!dirty} size="sm">
             <Icon name="check" size={16} /> {dirty ? "Save design" : "Saved"}
           </Button>
-          <Link to="/dashboard/cards" className="font-poppins text-[15px] text-secondary hover:underline">
-            See it in the dashboard →
+          <Link to="/dashboard/cards" className="font-sans text-[14px] text-forest link">
+            See it in the workspace
           </Link>
         </div>
       </div>

@@ -1,148 +1,140 @@
 import { useMemo, useState } from "react";
+import { usd0 } from "../../lib/format";
 import styles from "../../style";
 import AnimatedNumber from "../ui/AnimatedNumber";
 import RangeField from "../ui/RangeField";
 import Segmented from "../ui/Segmented";
-import { AreaChart, DonutChart } from "../ui/charts";
+import { AreaChart } from "../ui/charts";
 
-const usd = (v, digits = 0) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: digits }).format(v);
-
-const Stat = ({ label, value, digits = 0, highlight }) => (
-  <div className="rounded-[16px] bg-white/5 p-4 min-w-0">
-    <p className="font-poppins text-[13px] text-dimWhite">{label}</p>
-    <p className={`font-poppins font-semibold text-[20px] sm:text-[22px] truncate ${highlight ? "text-gradient" : "text-white"}`}>
-      <AnimatedNumber value={value} format={(v) => usd(v, digits)} />
+const Stat = ({ label, value, format = usd0, accent }) => (
+  <div className="min-w-0 py-3 xs:py-0 xs:px-4 first:pl-0 border-t xs:border-t-0 xs:border-l first:border-0 border-line">
+    <p className="font-sans text-[13px] text-muted">{label}</p>
+    <p className={`font-serif text-[30px] leading-tight truncate ${accent ? "text-forest" : "text-ink"}`}>
+      {typeof value === "number" ? <AnimatedNumber value={value} format={format} /> : value}
     </p>
   </div>
 );
 
-const SavingsPanel = () => {
-  const [initial, setInitial] = useState(5000);
-  const [monthly, setMonthly] = useState(400);
-  const [years, setYears] = useState(10);
-  const [apy, setApy] = useState(4.2);
+const Legend = ({ items }) => (
+  <div className="flex flex-wrap gap-5 mt-2 font-sans text-[13px] text-muted">
+    {items.map((i) => (
+      <span key={i.label} className="flex items-center gap-2">
+        <span className="w-4 h-0 border-t-2" style={{ borderColor: i.color, borderStyle: i.dashed ? "dashed" : "solid" }} />
+        {i.label}
+      </span>
+    ))}
+  </div>
+);
 
-  const { balances, contributions } = useMemo(() => {
-    const r = apy / 100 / 12;
-    let bal = initial;
-    const b = [initial];
-    const c = [initial];
-    for (let y = 1; y <= years; y += 1) {
-      for (let m = 0; m < 12; m += 1) bal = bal * (1 + r) + monthly;
-      b.push(bal);
-      c.push(initial + monthly * 12 * y);
-    }
-    return { balances: b, contributions: c };
-  }, [initial, monthly, years, apy]);
+const ReservePanel = () => {
+  const [income, setIncome] = useState(8500);
+  const [rate, setRate] = useState(25);
+  const [months, setMonths] = useState(6);
+  const [already, setAlready] = useState(4000);
+  const [bill, setBill] = useState(17000);
 
-  const final = balances[balances.length - 1];
-  const contributed = contributions[contributions.length - 1];
+  const { pot, labels } = useMemo(() => {
+    const p = Array.from({ length: months + 1 }, (_, m) => already + (income * rate * m) / 100);
+    return { pot: p, labels: p.map((_, i) => (i === 0 ? "Now" : `M${i}`)) };
+  }, [income, rate, months, already]);
+
+  const perMonth = (income * rate) / 100;
+  const atDue = pot[pot.length - 1];
+  const gap = atDue - bill;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div className="flex flex-col gap-6">
-        <RangeField label="Initial deposit" value={initial} min={0} max={50000} step={500} onChange={setInitial} format={(v) => usd(v)} />
-        <RangeField label="Monthly contribution" value={monthly} min={0} max={3000} step={50} onChange={setMonthly} format={(v) => usd(v)} />
-        <RangeField label="Time horizon" value={years} min={1} max={30} onChange={setYears} format={(v) => `${v} yr${v > 1 ? "s" : ""}`} />
-        <RangeField label="Savings APY" value={apy} min={0.5} max={6} step={0.1} onChange={setApy} format={(v) => `${v.toFixed(1)}%`} />
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+      <div className="md:col-span-5 flex flex-col gap-7">
+        <RangeField label="Invoiced per month" value={income} min={1000} max={30000} step={250} onChange={setIncome} format={usd0} />
+        <RangeField label="Set aside for tax" value={rate} min={10} max={45} onChange={setRate} format={(v) => `${v}%`} />
+        <RangeField label="Months until the bill" value={months} min={1} max={12} onChange={setMonths} format={(v) => `${v} month${v > 1 ? "s" : ""}`} />
+        <RangeField label="Already in the tax pot" value={already} min={0} max={30000} step={500} onChange={setAlready} format={usd0} />
+        <RangeField label="Expected tax bill" value={bill} min={1000} max={60000} step={500} onChange={setBill} format={usd0} />
       </div>
-      <div className="flex flex-col gap-4 min-w-0">
-        <div className="grid grid-cols-1 xs:grid-cols-3 gap-3">
-          <Stat label="Final balance" value={final} highlight />
-          <Stat label="You put in" value={contributed} />
-          <Stat label="Interest earned" value={final - contributed} />
+      <div className="md:col-span-7 flex flex-col gap-6 min-w-0">
+        <div className="grid grid-cols-1 xs:grid-cols-3">
+          <Stat label="Into the pot each month" value={perMonth} accent />
+          <Stat label="In the pot when due" value={atDue} />
+          <Stat label={gap >= 0 ? "Left over" : "Shortfall"} value={Math.abs(gap)} />
         </div>
-        <div className="rounded-[16px] bg-white/5 p-4">
+        <div className="border-t border-line pt-4">
           <AreaChart
-            ariaLabel={`Savings growth over ${years} years`}
-            labels={balances.map((_, i) => (i === 0 ? "Now" : `Y${i}`))}
+            ariaLabel={`Tax pot growing to ${usd0(atDue)} over ${months} months against an expected bill of ${usd0(bill)}`}
+            labels={labels}
             series={[
-              { key: "bal", label: "Balance", color: "#5ce1e6", values: balances },
-              { key: "con", label: "Contributions", color: "#fc67fa", values: contributions },
+              { key: "pot", label: "Tax pot", color: "#0e3b2c", values: pot },
+              { key: "bill", label: "Expected bill", color: "#b8893d", values: pot.map(() => bill), fill: false, dashed: true },
             ]}
           />
-          <div className="flex gap-5 mt-2 font-poppins text-[13px] text-dimWhite">
-            <span className="flex items-center gap-2"><span className="w-3 h-1 rounded bg-[#5ce1e6]" />Balance</span>
-            <span className="flex items-center gap-2"><span className="w-3 h-1 rounded bg-[#fc67fa]" />Contributions</span>
-          </div>
+          <Legend
+            items={[
+              { label: "Tax pot", color: "#0e3b2c" },
+              { label: "Expected bill", color: "#b8893d", dashed: true },
+            ]}
+          />
         </div>
+        <p className="font-sans text-[13px] text-faint">Illustrative only, not tax advice. Your accountant should confirm the right percentage.</p>
       </div>
     </div>
   );
 };
 
-const LoanPanel = () => {
-  const [amount, setAmount] = useState(12000);
-  const [months, setMonths] = useState(36);
-  const [apr, setApr] = useState(14.9);
+const RunwayPanel = () => {
+  const [cash, setCash] = useState(42000);
+  const [revenue, setRevenue] = useState(9000);
+  const [costs, setCosts] = useState(11500);
 
-  const { payment, interest, interestWithIntro } = useMemo(() => {
-    const r = apr / 100 / 12;
-    const pay = r === 0 ? amount / months : (amount * r) / (1 - Math.pow(1 + r, -months));
-    let bal = amount;
-    let introInterest = 0;
-    for (let m = 0; m < months && bal > 0; m += 1) {
-      const i = m < 18 ? 0 : bal * r;
-      introInterest += i;
-      bal = bal + i - pay;
-    }
-    return { payment: pay, interest: pay * months - amount, interestWithIntro: Math.max(introInterest, 0) };
-  }, [amount, months, apr]);
+  const net = revenue - costs;
+  const balances = useMemo(() => Array.from({ length: 19 }, (_, i) => Math.max(cash + net * i, 0)), [cash, net]);
+  const runway = net >= 0 ? null : cash / -net;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div className="flex flex-col gap-6">
-        <RangeField label="Balance to transfer" value={amount} min={1000} max={100000} step={500} onChange={setAmount} format={(v) => usd(v)} />
-        <RangeField label="Payoff term" value={months} min={6} max={84} step={6} onChange={setMonths} format={(v) => `${v} months`} />
-        <RangeField label="Current card APR" value={apr} min={0} max={30} step={0.1} onChange={setApr} format={(v) => `${v.toFixed(1)}%`} />
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+      <div className="md:col-span-5 flex flex-col gap-7">
+        <RangeField label="Cash in the business" value={cash} min={2000} max={200000} step={1000} onChange={setCash} format={usd0} />
+        <RangeField label="Average monthly revenue" value={revenue} min={0} max={40000} step={250} onChange={setRevenue} format={usd0} />
+        <RangeField label="Monthly costs, including your pay" value={costs} min={1000} max={40000} step={250} onChange={setCosts} format={usd0} />
       </div>
-      <div className="flex flex-col gap-4 min-w-0">
-        <div className="grid grid-cols-1 xs:grid-cols-3 gap-3">
-          <Stat label="Monthly payment" value={payment} digits={2} highlight />
-          <Stat label="Interest elsewhere" value={interest} />
-          <Stat label="Saved with HooBank" value={Math.max(interest - interestWithIntro, 0)} />
+      <div className="md:col-span-7 flex flex-col gap-6 min-w-0">
+        <div className="grid grid-cols-1 xs:grid-cols-3">
+          <Stat label="Net each month" value={net} format={(v) => `${v < 0 ? "−" : "+"}${usd0(Math.abs(v))}`} />
+          <Stat label="Runway" value={runway == null ? "Positive" : `${runway >= 18 ? "18+" : runway.toFixed(1)} mo`} accent />
+          <Stat label="Cash in 12 months" value={balances[12]} />
         </div>
-        <div className="rounded-[16px] bg-white/5 p-5 flex flex-col xs:flex-row items-center gap-6">
-          <DonutChart
-            size={180}
-            thickness={22}
-            centerTitle="Total cost"
-            centerValue={usd(amount + interest)}
-            data={[
-              { label: "Principal", value: amount, color: "#5ce1e6" },
-              { label: "Interest", value: Math.max(interest, 0.0001), color: "#fc67fa" },
-            ]}
+        <div className="border-t border-line pt-4">
+          <AreaChart
+            ariaLabel={runway == null ? "Cash balance grows over 18 months" : `Cash lasts about ${runway.toFixed(1)} months`}
+            labels={balances.map((_, i) => (i === 0 ? "Now" : `M${i}`))}
+            series={[{ key: "cash", label: "Cash", color: "#0e3b2c", values: balances }]}
           />
-          <ul className="font-poppins text-[14px] text-dimWhite flex flex-col gap-3">
-            <li className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-[#5ce1e6]" />Principal {usd(amount)}</li>
-            <li className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-[#fc67fa]" />Interest {usd(interest)}</li>
-            <li className="text-white">0% intro APR for the first 18 months on HooBank.</li>
-          </ul>
+          <Legend items={[{ label: "Projected cash", color: "#0e3b2c" }]} />
         </div>
       </div>
     </div>
   );
 };
 
-/** Savings / balance-transfer calculator with sliders, animated results and SVG charts. */
-const FinanceCalculator = ({ defaultMode = "savings", className = "" }) => {
+/** Planning calculators: tax reserve and runway, with sliders, animated results and SVG charts. */
+const FinanceCalculator = ({ defaultMode = "reserve", className = "" }) => {
   const [mode, setMode] = useState(defaultMode);
   return (
     <div className={`${styles.card} p-6 sm:p-10 ${className}`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <h3 className={styles.heading3}>{mode === "savings" ? "Savings calculator" : "Balance transfer planner"}</h3>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 pb-6 border-b border-line">
+        <div>
+          <p className={styles.overline}>Planner</p>
+          <h3 className={`${styles.h3} mt-2`}>{mode === "reserve" ? "How much to set aside for tax" : "How long the cash will last"}</h3>
+        </div>
         <Segmented
-          label="Calculator mode"
+          label="Planner mode"
           value={mode}
           onChange={setMode}
           options={[
-            { value: "savings", label: "Savings" },
-            { value: "loan", label: "Balance transfer" },
+            { value: "reserve", label: "Tax reserve" },
+            { value: "runway", label: "Runway" },
           ]}
         />
       </div>
-      {mode === "savings" ? <SavingsPanel /> : <LoanPanel />}
+      {mode === "reserve" ? <ReservePanel /> : <RunwayPanel />}
     </div>
   );
 };

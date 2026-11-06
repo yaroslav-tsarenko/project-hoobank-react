@@ -4,61 +4,45 @@ import AnimatedNumber from "../ui/AnimatedNumber";
 import Switch from "../ui/Switch";
 
 const CHECKS = [
-  { id: "twofa", label: "Two-factor authentication", description: "Codes on every new device sign-in.", weight: 25 },
-  { id: "bio", label: "Biometric sign-in", description: "Face ID or fingerprint to open the app.", weight: 20 },
-  { id: "alerts", label: "Instant transaction alerts", description: "Get pinged for every payment.", weight: 15 },
-  { id: "virtual", label: "Virtual cards for online shopping", description: "Single-use numbers keep your real card safe.", weight: 15 },
-  { id: "travel", label: "Block card use abroad", description: "Re-enable it in one tap when you travel.", weight: 10 },
-  { id: "pin", label: "Separate payment PIN", description: "Extra confirmation for large transfers.", weight: 15 },
+  { id: "passkey", label: "Passkey sign-in", description: "Device-bound keys instead of passwords and SMS codes.", weight: 25 },
+  { id: "devices", label: "Approve new devices", description: "A new laptop or phone must be confirmed from a trusted one.", weight: 20 },
+  { id: "payee", label: "Confirm new payees", description: "A second step before the first payment to anyone new.", weight: 20 },
+  { id: "threshold", label: "Approval over $5,000", description: "Large transfers need a second confirmation.", weight: 15 },
+  { id: "roles", label: "Read-only accountant role", description: "Your accountant can export, but cannot pay.", weight: 10 },
+  { id: "abroad", label: "Lock card use abroad", description: "Re-enable it in one step when you travel.", weight: 10 },
 ];
 
 const verdict = (score) => {
-  if (score >= 90) return { label: "Fort Knox", color: "#5ce1e6" };
-  if (score >= 60) return { label: "Well protected", color: "#7de7eb" };
-  if (score >= 35) return { label: "Getting there", color: "#f6c26b" };
-  return { label: "Needs attention", color: "#fc67fa" };
+  if (score >= 90) return { label: "Well protected", text: "Every recommended control is on." };
+  if (score >= 60) return { label: "Good", text: "A couple of controls would close the remaining gaps." };
+  if (score >= 35) return { label: "Partly protected", text: "Turn on payee confirmation and device approval next." };
+  return { label: "Needs attention", text: "Start with passkeys; they stop most account takeovers." };
 };
 
-/** Toggle security settings to watch your protection score animate. */
+/** Toggle security settings to see a protection score change. */
 const SecurityCheckup = () => {
-  const [on, setOn] = useState({ twofa: true, alerts: true });
+  const [on, setOn] = useState({ passkey: true, payee: true });
   const score = CHECKS.reduce((s, c) => s + (on[c.id] ? c.weight : 0), 0);
   const v = verdict(score);
-  const r = 70;
-  const circ = 2 * Math.PI * r;
 
   return (
-    <div className={`${styles.card} p-6 sm:p-10 grid grid-cols-1 md:grid-cols-[auto_1fr] gap-10 items-center`}>
-      <div className="flex flex-col items-center">
-        <div className="relative w-[180px] h-[180px]">
-          <svg viewBox="0 0 160 160" className="w-full h-full -rotate-90" aria-hidden="true">
-            <circle cx="80" cy="80" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="12" />
-            <circle
-              cx="80"
-              cy="80"
-              r={r}
-              fill="none"
-              stroke={v.color}
-              strokeWidth="12"
-              strokeLinecap="round"
-              strokeDasharray={circ}
-              strokeDashoffset={circ * (1 - score / 100)}
-              style={{ transition: "stroke-dashoffset .7s cubic-bezier(.25,.46,.45,.94), stroke .4s" }}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center" aria-live="polite">
-            <span className="font-poppins font-semibold text-[40px] text-white">
-              <AnimatedNumber value={score} format={(n) => Math.round(n)} />
-            </span>
-            <span className="font-poppins text-[13px] text-dimWhite">of 100</span>
-          </div>
-        </div>
-        <p className="font-poppins font-semibold text-[18px] mt-4" style={{ color: v.color }}>
-          {v.label}
+    <div className={`${styles.card} grid grid-cols-1 md:grid-cols-12`}>
+      <div className="md:col-span-5 p-6 sm:p-10 border-b md:border-b-0 md:border-r border-line flex flex-col">
+        <p className={styles.overline}>Protection score</p>
+        <p className="font-serif text-[96px] leading-none text-ink mt-4" aria-live="polite">
+          <AnimatedNumber value={score} format={(n) => Math.round(n)} />
+          <span className="text-[32px] text-muted"> / 100</span>
         </p>
+        <div className="flex gap-1 mt-6" aria-hidden="true">
+          {Array.from({ length: 20 }, (_, i) => (
+            <span key={i} className={`h-2 flex-1 transition-colors duration-300 ${i < score / 5 ? "bg-forest" : "bg-line"}`} />
+          ))}
+        </div>
+        <p className="font-serif text-[28px] text-forest mt-6">{v.label}</p>
+        <p className="font-sans text-[15px] text-muted mt-1">{v.text}</p>
       </div>
-      <div className="flex flex-col gap-5">
-        <h3 className={styles.heading3}>Security checkup</h3>
+      <div className="md:col-span-7 p-6 sm:p-10 flex flex-col gap-5">
+        <h3 className="font-sans font-semibold text-[15px] text-ink">Your controls</h3>
         {CHECKS.map((c) => (
           <Switch key={c.id} checked={!!on[c.id]} onChange={(val) => setOn((s) => ({ ...s, [c.id]: val }))} label={c.label} description={c.description} />
         ))}

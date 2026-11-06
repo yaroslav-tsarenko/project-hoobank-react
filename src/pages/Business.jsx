@@ -1,116 +1,146 @@
-import { CTA } from "../components";
 import Button from "../components/Button";
+import CTA from "../components/CTA";
 import { BarChart } from "../components/ui/charts";
 import Container from "../components/ui/Container";
-import CountUp from "../components/ui/CountUp";
 import Icon from "../components/ui/Icon";
 import PageHero from "../components/ui/PageHero";
 import Reveal from "../components/ui/Reveal";
 import SectionHeading from "../components/ui/SectionHeading";
 import TeamSpendControls from "../components/widgets/TeamSpendControls";
-import Clients from "../components/Clients";
 import usePageMeta from "../hooks/usePageMeta";
 import styles from "../style";
 
 const BENEFITS = [
-  { icon: "users", title: "Team cards", text: "Issue unlimited virtual and physical cards with per-person limits." },
-  { icon: "list", title: "Invoices & billing", text: "Create, send and reconcile invoices without leaving HooBank." },
-  { icon: "globe", title: "Global payouts", text: "Pay suppliers and contractors in 30+ currencies at mid-market rates." },
-  { icon: "pieChart", title: "Real-time reporting", text: "Live dashboards, exports and accounting integrations." },
-  { icon: "shieldCheck", title: "Approval flows", text: "Multi-step approvals and audit logs for every transaction." },
-  { icon: "zap", title: "Instant onboarding", text: "Open a business account online in about 10 minutes." },
+  { icon: "users", title: "Roles that match real work", text: "Owner, Admin, Member and Accountant. Accountants can export everything and move nothing." },
+  { icon: "card", title: "Cards with a monthly cap", text: "Issue a card to a contractor for a project and freeze it the day the project ends." },
+  { icon: "shieldCheck", title: "Approvals above a threshold", text: "Payments over an amount you choose wait for a second person to confirm." },
+  { icon: "fileText", title: "Invoices in the studio’s name", text: "Shared templates, numbering and reminders, whoever sends the invoice." },
+  { icon: "globe", title: "Pay contractors abroad", text: "Hold euros or zloty for the people you pay in them, and pay out over local rails." },
+  { icon: "download", title: "Month-end in one export", text: "Receipts, categories and VAT codes in a single file for Xero, QuickBooks or CSV." },
 ];
 
-const REVENUE = [
-  { label: "Jan", in: 42000, out: 31000 },
-  { label: "Feb", in: 46000, out: 33000 },
-  { label: "Mar", in: 51000, out: 35500 },
-  { label: "Apr", in: 49000, out: 34000 },
-  { label: "May", in: 58000, out: 37000 },
-  { label: "Jun", in: 63000, out: 39000 },
+const FLOW = [
+  { label: "Jan", in: 31000, out: 24500 },
+  { label: "Feb", in: 28500, out: 23800 },
+  { label: "Mar", in: 36200, out: 26100 },
+  { label: "Apr", in: 33900, out: 25400 },
+  { label: "May", in: 41000, out: 28700 },
+  { label: "Jun", in: 38600, out: 27900 },
 ];
-const k = (v) => `$${Math.round(v / 1000)}k`;
+const k = (v) => `$${(v / 1000).toFixed(1)}k`;
 
 const Business = () => {
-  usePageMeta("Business", "HooBank for business: team cards with spend controls, invoicing, global payouts and real-time reporting.");
+  usePageMeta("For teams", "Northvault for small teams: roles, team cards with limits, approvals, shared invoicing and month-end exports.");
   return (
     <>
       <PageHero
-        eyebrow="HooBank for Business"
-        title="You do the business,"
-        highlight="we’ll handle the money."
-        description="Corporate cards, invoices, global payouts and live reporting — built for startups and growing teams."
-        aside={
-          <div className="w-full max-w-[520px]">
-            <TeamSpendControls />
-          </div>
-        }
+        eyebrow="Northvault for teams"
+        title="For studios of"
+        highlight="two to ten."
+        description="When a practice becomes a small team, the account has to keep up: more cards, a second pair of eyes on payments and an accountant who can see everything."
+        aside={<TeamSpendControls className="w-full max-w-[520px]" />}
       >
-        <Button to="/contact?topic=sales">Talk to sales</Button>
+        <Button to="/contact?topic=sales">Talk to us</Button>
         <Button to="/pricing" variant="outline">
-          See pricing
+          Team plan pricing
         </Button>
       </PageHero>
 
-      <Container className="py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {[
-            { value: 230, suffix: "+", label: "Companies onboarded" },
-            { value: 18, suffix: " hrs", label: "Saved per month on bookkeeping" },
-            { value: 0, prefix: "$", label: "Monthly fee on Starter" },
-          ].map((s, i) => (
-            <Reveal key={s.label} delay={i * 100} className={`${styles.glassCard} p-6`}>
-              <p className="font-poppins font-semibold text-[40px] text-white">
-                <CountUp value={s.value} prefix={s.prefix} suffix={s.suffix} />
-              </p>
-              <p className="font-poppins text-dimWhite">{s.label}</p>
-            </Reveal>
-          ))}
-        </div>
-      </Container>
-
-      <Container className="py-16">
-        <SectionHeading eyebrow="Built for teams" title="Everything finance teams ask for" className="mb-12" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Container className="py-16 sm:py-24">
+        <SectionHeading index="01" eyebrow="Built for small teams" title="What changes when you add people." className="mb-12" />
+        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-line border border-line rounded-card overflow-hidden">
           {BENEFITS.map((b, i) => (
-            <Reveal key={b.title} delay={(i % 3) * 100} className="feature-card rounded-[20px] p-6 border border-white/5">
-              <span className={`w-14 h-14 rounded-full ${styles.flexCenter} bg-dimBlue text-secondary`}>
-                <Icon name={b.icon} size={24} />
-              </span>
-              <h3 className={`${styles.heading4} mt-5`}>{b.title}</h3>
-              <p className="font-poppins text-dimWhite text-[15px] mt-2">{b.text}</p>
+            <Reveal as="li" key={b.title} delay={(i % 3) * 80} className="bg-ivory p-6 sm:p-8">
+              <Icon name={b.icon} size={22} className="text-forest" />
+              <h3 className="font-serif text-[28px] leading-[1.1] text-ink mt-8">{b.title}</h3>
+              <p className="font-sans text-[15px] leading-[1.6] text-muted mt-3">{b.text}</p>
             </Reveal>
           ))}
-        </div>
+        </ul>
       </Container>
 
-      <Container className="py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <Container className="py-16 sm:py-24 border-t border-line">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           <SectionHeading
+            className="md:col-span-5"
+            index="02"
             eyebrow="Cash flow"
-            title="See your runway at a glance"
-            description="Money in vs. money out, updated in real time. Hover the bars to explore."
+            title="See the month before it ends."
+            description="Money in against money out, by month, with the same categories your accountant uses. Hover the bars for the figures."
           >
             <Button to="/dashboard" variant="outline" className="mt-8">
-              Open demo dashboard
+              Open the demo workspace
             </Button>
           </SectionHeading>
-          <Reveal className={`${styles.card} p-6`}>
+          <Reveal className={`md:col-span-7 ${styles.card} p-6 sm:p-8`}>
+            <div className="flex items-center justify-between mb-6">
+              <p className="font-sans font-semibold text-[15px] text-ink">Lowe &amp; Field, first half</p>
+              <div className="flex gap-4 font-sans text-[13px] text-muted">
+                <span className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 bg-forest" />
+                  In
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 bg-brass" />
+                  Out
+                </span>
+              </div>
+            </div>
             <BarChart
-              data={REVENUE}
+              data={FLOW}
               format={k}
               series={[
-                { key: "in", label: "Money in", color: "#5ce1e6" },
-                { key: "out", label: "Money out", color: "#fc67fa" },
+                { key: "in", label: "Money in", color: "#0e3b2c" },
+                { key: "out", label: "Money out", color: "#b8893d" },
               ]}
             />
           </Reveal>
         </div>
       </Container>
 
-      <Container className="py-8">
-        <Clients />
-        <CTA title="Let’s grow your business." text="Book a 20-minute demo with our team and get your first three months of Plus free." primary={{ to: "/contact?topic=sales", label: "Book a demo" }} secondary={{ to: "/signup", label: "Open account" }} />
+      <Container className="py-16 sm:py-24 border-t border-line">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <SectionHeading className="md:col-span-5" index="03" eyebrow="Roles" title="Who can do what." />
+          <Reveal className="md:col-span-7 overflow-x-auto border-y border-line">
+            <table className="w-full min-w-[520px] font-sans text-[14px]">
+              <caption className="sr-only">Permissions by role</caption>
+              <thead>
+                <tr className="border-b border-ink text-left">
+                  <th scope="col" className="py-3 pr-4 font-normal text-muted">
+                    &nbsp;
+                  </th>
+                  {["Owner", "Admin", "Member", "Accountant"].map((r) => (
+                    <th key={r} scope="col" className="py-3 px-3 font-medium text-ink text-center">
+                      {r}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Send payments", [true, true, false, false]],
+                  ["Approve large payments", [true, true, false, false]],
+                  ["Use a card", [true, true, true, false]],
+                  ["Create invoices", [true, true, true, false]],
+                  ["Export statements", [true, true, false, true]],
+                  ["Manage people", [true, false, false, false]],
+                ].map(([label, vals]) => (
+                  <tr key={label} className="border-b border-line last:border-b-0">
+                    <th scope="row" className="py-3 pr-4 text-left font-normal text-muted">
+                      {label}
+                    </th>
+                    {vals.map((v, i) => (
+                      <td key={i} className="py-3 px-3 text-center">
+                        {v ? <Icon name="check" size={17} className="text-forest mx-auto" label="Allowed" /> : <span className="text-faint" aria-label="Not allowed">—</span>}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Reveal>
+        </div>
+        <CTA title="Bring the team over in an afternoon." text="Invite people, issue their cards and set limits before the next project starts." primary={{ to: "/contact?topic=sales", label: "Book a walkthrough" }} secondary={{ to: "/signup?plan=team", label: "Start on Team" }} />
       </Container>
     </>
   );

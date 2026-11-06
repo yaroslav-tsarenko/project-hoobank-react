@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /dashboard
 
-Sitemap: https://www.hoobank.com/sitemap.xml
+Sitemap: https://northvault.example/sitemap.xml

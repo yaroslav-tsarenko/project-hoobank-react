@@ -1,42 +1,29 @@
+/**
+ * Shared Tailwind class strings — the Northvault type scale and control styles.
+ * Display sizes use Instrument Serif; UI and body use Instrument Sans.
+ */
 const styles = {
-  boxWidth: "xl:max-w-[1280px] w-full",
+  container: "w-full max-w-site mx-auto px-5 sm:px-8 lg:px-10",
 
-  heading1: "font-poppins font-semibold ss:text-[64px] text-[44px] text-white ss:leading-[84px] leading-[58px] w-full",
-  heading2: "font-poppins font-semibold xs:text-[48px] text-[36px] text-white xs:leading-[76.8px] leading-[50px] w-full",
-  heading3: "font-poppins font-semibold text-white xs:text-[28px] text-[24px] xs:leading-[40px] leading-[34px]",
-  heading4: "font-poppins font-semibold text-white text-[18px] leading-[23.4px]",
-  paragraph: "font-poppins font-normal text-dimWhite text-[18px] leading-[30.8px]",
-  small: "font-poppins font-normal text-dimWhite text-[14px] leading-[22px]",
-  eyebrow: "font-poppins font-medium text-[14px] tracking-[0.18em] uppercase",
+  display: "font-serif font-normal text-ink text-[52px] leading-[0.98] xs:text-[64px] sm:text-[80px] md:text-[92px] tracking-[-0.02em]",
+  h1: "font-serif font-normal text-ink text-[44px] leading-[1.02] sm:text-[60px] md:text-[68px] tracking-[-0.015em]",
+  h2: "font-serif font-normal text-ink text-[36px] leading-[1.05] sm:text-[48px] tracking-[-0.01em]",
+  h3: "font-serif font-normal text-ink text-[28px] leading-[1.1] sm:text-[32px]",
+  h4: "font-sans font-semibold text-ink text-[17px] leading-[1.35]",
+  lead: "font-sans text-muted text-[18px] leading-[1.6] sm:text-[19px]",
+  body: "font-sans text-muted text-[16px] leading-[1.65]",
+  small: "font-sans text-muted text-[14px] leading-[1.55]",
+  overline: "font-sans font-medium uppercase tracking-[0.14em] text-[12px] leading-4 text-muted",
+  bigNumber: "font-serif font-normal text-ink num tracking-[-0.01em]",
 
-  flexCenter: "flex justify-center items-center",
-  flexStart: "flex justify-center items-start",
-
-  paddingX: "sm:px-16 px-6",
-  paddingY: "sm:py-16 py-6",
-  padding: "sm:px-16 px-6 sm:py-12 py-4",
-
-  marginX: "sm:mx-16 mx-6",
-  marginY: "sm:my-16 my-6",
-
-  card: "rounded-[20px] bg-black-gradient box-shadow",
-  glassCard: "rounded-[20px] glass",
+  card: "rounded-card bg-paper border border-line",
+  panel: "rounded-card bg-paper border border-line p-5 sm:p-6",
   input:
-    "w-full rounded-[10px] bg-surface border border-white/10 px-4 py-3 font-poppins text-[16px] text-white placeholder:text-white/40 outline-none transition focus:border-secondary/70 focus:ring-2 focus:ring-secondary/20 aria-[invalid=true]:border-red-400/70",
-  label: "font-poppins font-medium text-[14px] text-white/90 mb-2 block",
-  chip: "inline-flex items-center gap-2 rounded-full px-4 py-2 font-poppins text-[14px] transition border",
-  chipActive: "bg-blue-gradient text-primary border-transparent",
-  chipIdle: "border-white/10 text-dimWhite hover:text-white hover:border-white/30",
-};
-
-export const layout = {
-  section: `flex md:flex-row flex-col ${styles.paddingY}`,
-  sectionReverse: `flex md:flex-row flex-col-reverse ${styles.paddingY}`,
-
-  sectionImgReverse: `flex-1 flex ${styles.flexCenter} md:mr-10 mr-0 md:mt-0 mt-10 relative`,
-  sectionImg: `flex-1 flex ${styles.flexCenter} md:ml-10 ml-0 md:mt-0 mt-10 relative`,
-
-  sectionInfo: `flex-1 ${styles.flexStart} flex-col`,
+    "w-full rounded-control bg-paper border border-line px-3.5 py-2.5 font-sans text-[16px] text-ink placeholder:text-faint outline-none transition focus:border-forest focus:ring-2 focus:ring-forest/15 aria-[invalid=true]:border-negative",
+  label: "font-sans font-medium text-[14px] text-ink mb-1.5 block",
+  chip: "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-sans text-[14px] transition border",
+  chipActive: "bg-forest text-ivory border-forest",
+  chipIdle: "bg-paper border-line text-muted hover:text-ink hover:border-ink/40",
 };
 
 export default styles;

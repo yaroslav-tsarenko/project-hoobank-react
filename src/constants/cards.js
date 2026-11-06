@@ -1,48 +1,49 @@
+/** Card materials. `ink` is the text colour that keeps AA contrast on the material. */
 export const cardColors = [
-  { id: "cyan", name: "Cyan Wave", background: "linear-gradient(135deg, #5ce1e6 0%, #33bbcf 35%, #214d76 100%)" },
-  { id: "midnight", name: "Midnight", background: "linear-gradient(144deg, #3a3a46 -30%, #11101d 70%)" },
-  { id: "aurora", name: "Aurora", background: "linear-gradient(135deg, #f4c4f3 0%, #fc67fa 40%, #5b21b6 100%)" },
-  { id: "ocean", name: "Deep Ocean", background: "linear-gradient(160deg, #214d76 0%, #0b1f3a 55%, #00040f 100%)" },
-  { id: "sunset", name: "Sunset", background: "linear-gradient(135deg, #ffd29d 0%, #fc8a7a 45%, #c2389e 100%)" },
-  { id: "emerald", name: "Emerald", background: "linear-gradient(135deg, #7de7eb 0%, #09977c 45%, #064e3b 100%)" },
+  { id: "forest", name: "Forest", background: "linear-gradient(155deg, #175440 0%, #0e3b2c 48%, #0a2b20 100%)", ink: "#f6f3ec", accent: "#dcbb7e" },
+  { id: "graphite", name: "Graphite", background: "linear-gradient(155deg, #2b302d 0%, #171b19 55%, #0d0f0e 100%)", ink: "#f6f3ec", accent: "#dcbb7e" },
+  { id: "ivory", name: "Ivory", background: "linear-gradient(155deg, #fbf8f1 0%, #efe9dc 55%, #e2dacb 100%)", ink: "#121614", accent: "#80601f" },
+  { id: "brass", name: "Brass", background: "linear-gradient(155deg, #d4ac68 0%, #b8893d 50%, #93692a 100%)", ink: "#121614", accent: "#121614" },
+  { id: "claret", name: "Claret", background: "linear-gradient(155deg, #6b2a31 0%, #4f1d23 55%, #361317 100%)", ink: "#f6f3ec", accent: "#dcbb7e" },
+  { id: "slate", name: "Slate", background: "linear-gradient(155deg, #55636f 0%, #3b4650 55%, #283038 100%)", ink: "#f6f3ec", accent: "#dcbb7e" },
 ];
 
 export const cardFinishes = [
-  { id: "glossy", name: "Glossy", description: "Mirror-like sheen that follows the light." },
-  { id: "matte", name: "Matte", description: "Soft-touch texture with a subtle grain." },
-  { id: "metal", name: "Brushed metal", description: "Fine brushed lines with a steel glint." },
-  { id: "holo", name: "Holographic", description: "Iridescent colour shift as you tilt." },
+  { id: "matte", name: "Matte", description: "Soft-touch coating, no glare." },
+  { id: "linen", name: "Linen", description: "A fine woven texture you can feel." },
+  { id: "brushed", name: "Brushed metal", description: "Stainless steel core, brushed by hand." },
+  { id: "mirror", name: "Mirror", description: "A clear lacquer with a gentle sheen." },
 ];
 
 export const defaultCardDesign = {
-  color: "cyan",
-  finish: "glossy",
+  color: "forest",
+  finish: "matte",
   name: "Alex Morgan",
-  tier: "Plus",
+  tier: "Studio",
 };
 
 export const cardTiers = [
   {
-    id: "classic",
-    name: "Classic",
+    id: "solo",
+    name: "Solo",
     price: "Free",
-    design: { color: "midnight", finish: "matte", name: "Classic Member", tier: "Classic" },
-    perks: ["1% cash back", "Free virtual card", "Instant freeze"],
+    design: { color: "ivory", finish: "matte", name: "Solo Member", tier: "Solo" },
+    perks: ["1 physical + 1 virtual card", "Spend in 12 currencies", "Instant freeze and unfreeze"],
   },
   {
-    id: "plus",
-    name: "Plus",
-    price: "$9 / mo",
-    design: { color: "cyan", finish: "glossy", name: "Plus Member", tier: "Plus" },
-    perks: ["Up to 3% cash back", "30+ currencies", "Premium finishes"],
+    id: "studio",
+    name: "Studio",
+    price: "$12 / month",
+    design: { color: "forest", finish: "linen", name: "Studio Member", tier: "Studio" },
+    perks: ["Up to 5 cards, 20 virtual", "Merchant and category locks", "Receipts matched automatically"],
     popular: true,
   },
   {
-    id: "premium",
-    name: "Premium",
-    price: "$19 / mo",
-    design: { color: "aurora", finish: "holo", name: "Premium Member", tier: "Premium" },
-    perks: ["5% travel & dining", "Lounge access", "Travel insurance"],
+    id: "team",
+    name: "Team",
+    price: "$29 / month",
+    design: { color: "graphite", finish: "brushed", name: "Team Member", tier: "Team" },
+    perks: ["Cards for up to 10 people", "Per-person monthly limits", "Approval for spend over a threshold"],
   },
 ];
 

@@ -13,26 +13,26 @@ import styles from "../style";
 
 const TOPICS = [
   { value: "support", label: "Account support" },
-  { value: "sales", label: "Business & sales" },
+  { value: "sales", label: "Teams and partnerships" },
   { value: "press", label: "Press" },
   { value: "careers", label: "Careers" },
   { value: "security", label: "Security report" },
 ];
 
 const OFFICES = [
-  { city: "Kyiv", address: "12 Khreshchatyk St, Kyiv 01001", x: 62, y: 34 },
-  { city: "London", address: "1 Finsbury Ave, London EC2M", x: 47, y: 30 },
-  { city: "New York", address: "88 Spring St, New York, NY", x: 26, y: 38 },
+  { city: "Lisbon", address: "Rua da Prata 80, 1100-415 Lisboa", time: "Product and engineering" },
+  { city: "Berlin", address: "Torstraße 140, 10119 Berlin", time: "Partnerships" },
+  { city: "London", address: "18 Hatton Garden, London EC1N 8AT", time: "Customer operations" },
 ];
 
 const CHANNELS = [
-  { icon: "chat", title: "Live chat", text: "Tap the chat bubble — avg. reply in 3 min.", to: "/help" },
-  { icon: "mail", title: "Email", text: "hello@hoobank.example", href: "mailto:hello@hoobank.example" },
-  { icon: "phone", title: "Phone", text: "+1 (555) 010-2049 · 24/7", href: "tel:+15550102049" },
+  { icon: "chat", title: "Chat", text: "The Questions button, bottom right", to: "/help" },
+  { icon: "mail", title: "Email", text: "hello@northvault.example", href: "mailto:hello@northvault.example" },
+  { icon: "phone", title: "Phone", text: "+44 20 7946 0000, weekdays", href: "tel:+442079460000" },
 ];
 
 const ContactContent = ({ topic }) => {
-  usePageMeta("Contact", "Get in touch with HooBank support, sales, press or security teams — we reply fast, 24/7.");
+  usePageMeta("Contact", "Contact the Northvault concept team about accounts, teams, press, careers or security.");
   const initialTopic = TOPICS.some((t) => t.value === topic) ? topic : "support";
   const toast = useToast();
   const [form, setForm] = useState({ name: "", email: "", topic: initialTopic, message: "" });
@@ -45,54 +45,53 @@ const ContactContent = ({ topic }) => {
     const next = {};
     if (form.name.trim().length < 2) next.name = "Please tell us your name.";
     if (!EMAIL_RE.test(form.email)) next.email = "Please enter a valid email address.";
-    if (form.message.trim().length < 10) next.message = "Your message should be at least 10 characters.";
+    if (form.message.trim().length < 10) next.message = "Please write at least 10 characters.";
     setErrors(next);
     if (Object.keys(next).length) return;
     setSending(true);
     window.setTimeout(() => {
       setSending(false);
-      toast({ title: "Message sent", description: `Thanks, ${form.name.split(" ")[0]}! We’ll reply to ${form.email} shortly. (Demo — nothing was sent.)` });
+      toast({ title: "Message recorded", description: `Thanks, ${form.name.split(" ")[0]}. In this demo nothing was sent to ${form.email}.` });
       setForm({ name: "", email: "", topic: form.topic, message: "" });
     }, 900);
   };
 
   return (
     <>
-      <PageHero eyebrow="We reply in minutes" title="Let’s" highlight="talk." description="Questions, feedback or partnership ideas — pick a channel or send us a message below." />
+      <PageHero eyebrow="Contact" title="Write to us." highlight="A person reads it." description="Questions about the concept, a team setup or a security report. Pick a channel or use the form." />
 
-      <Container className="pb-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <Container className="py-14">
+        <ul className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-line border border-line rounded-card overflow-hidden">
           {CHANNELS.map((c, i) => {
             const inner = (
               <>
-                <span className="w-12 h-12 rounded-full bg-dimBlue text-secondary flex items-center justify-center">
-                  <Icon name={c.icon} size={22} />
-                </span>
-                <span className="block font-poppins font-semibold text-white mt-4">{c.title}</span>
-                <span className="block font-poppins text-dimWhite text-[14px] mt-1">{c.text}</span>
+                <Icon name={c.icon} size={20} className="text-forest" />
+                <span className="block font-serif text-[28px] leading-tight text-ink mt-6">{c.title}</span>
+                <span className="block font-sans text-muted text-[15px] mt-1">{c.text}</span>
               </>
             );
+            const cls = "block w-full h-full p-6 bg-ivory hover:bg-paper transition-colors";
             return (
-              <Reveal key={c.title} delay={i * 100}>
+              <Reveal as="li" key={c.title} delay={i * 80}>
                 {c.to ? (
-                  <Link to={c.to} className="block w-full h-full p-6 rounded-[20px] bg-white/5 feature-card">
+                  <Link to={c.to} className={cls}>
                     {inner}
                   </Link>
                 ) : (
-                  <a href={c.href} className="block w-full h-full p-6 rounded-[20px] bg-white/5 feature-card">
+                  <a href={c.href} className={cls}>
                     {inner}
                   </a>
                 )}
               </Reveal>
             );
           })}
-        </div>
+        </ul>
       </Container>
 
-      <Container className="py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-          <form onSubmit={submit} noValidate className={`${styles.card} p-6 sm:p-10 flex flex-col gap-5`}>
-            <h2 className={styles.heading3}>Send a message</h2>
+      <Container className="py-14 pb-24 border-t border-line">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+          <form onSubmit={submit} noValidate className={`${styles.card} md:col-span-7 p-6 sm:p-10 flex flex-col gap-5`}>
+            <h2 className="font-serif text-[36px] leading-tight text-ink">Send a message</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field label="Name" value={form.name} onChange={set("name")} error={errors.name} autoComplete="name" />
               <Field label="Email" type="email" value={form.email} onChange={set("email")} error={errors.email} autoComplete="email" />
@@ -104,47 +103,30 @@ const ContactContent = ({ topic }) => {
                 </option>
               ))}
             </Field>
-            <Field as="textarea" label="Message" value={form.message} onChange={set("message")} error={errors.message} hint={`${form.message.length}/1000`} maxLength={1000} />
-            <Button type="submit" disabled={sending}>
+            <Field as="textarea" label="Message" value={form.message} onChange={set("message")} error={errors.message} hint={`${form.message.length} / 1000`} maxLength={1000} />
+            <Button type="submit" disabled={sending} className="self-start">
               {sending ? (
                 <>
-                  <span className="spinner !w-5 !h-5 !border-2" /> Sending…
+                  <span className="spinner !w-4 !h-4 !border-2 !border-ivory/30 !border-t-ivory" /> Sending
                 </>
               ) : (
                 <>
-                  Send message <Icon name="send" size={18} />
+                  Send message <Icon name="arrowRight" size={16} />
                 </>
               )}
             </Button>
           </form>
 
-          <Reveal className={`${styles.card} p-6 sm:p-8`}>
-            <h2 className={styles.heading3}>Our offices</h2>
-            <div className="relative mt-6 aspect-[16/9] rounded-[16px] overflow-hidden bg-[#060a18] border border-white/5" role="img" aria-label="Map showing HooBank offices in New York, London and Kyiv">
-              <div className="absolute inset-0 grid-bg" aria-hidden="true" />
-              <svg viewBox="0 0 100 56" className="absolute inset-0 w-full h-full" aria-hidden="true">
-                <path d="M26 38 Q36 20 47 30 T62 34" fill="none" stroke="url(#route)" strokeWidth="0.5" strokeDasharray="1.5 1.5" />
-                <defs>
-                  <linearGradient id="route" x1="0" x2="1">
-                    <stop offset="0%" stopColor="#5ce1e6" />
-                    <stop offset="100%" stopColor="#fc67fa" />
-                  </linearGradient>
-                </defs>
-              </svg>
+          <Reveal className="md:col-span-5">
+            <h2 className="font-serif text-[36px] leading-tight text-ink">Offices</h2>
+            <p className="font-sans text-[14px] text-muted mt-2">Fictional addresses for the concept.</p>
+            <ul className="mt-6 border-t border-line">
               {OFFICES.map((o) => (
-                <span key={o.city} className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: `${o.x}%`, top: `${o.y * (100 / 56)}%` }}>
-                  <span className="w-3 h-3 rounded-full bg-secondary pulse-dot" />
-                  <span className="font-poppins text-[11px] text-white mt-1 bg-primary/70 rounded px-1.5">{o.city}</span>
-                </span>
-              ))}
-            </div>
-            <ul className="flex flex-col gap-4 mt-6">
-              {OFFICES.map((o) => (
-                <li key={o.city} className="flex gap-3">
-                  <Icon name="mapPin" size={20} className="text-secondary mt-0.5" />
+                <li key={o.city} className="py-5 border-b border-line grid grid-cols-[110px_1fr] gap-4">
+                  <span className="font-serif text-[26px] leading-none text-ink">{o.city}</span>
                   <span>
-                    <span className="block font-poppins text-white font-medium">{o.city}</span>
-                    <span className="block font-poppins text-dimWhite text-[14px]">{o.address}</span>
+                    <span className="block font-sans text-[15px] text-ink">{o.address}</span>
+                    <span className="block font-sans text-[13px] text-muted mt-0.5">{o.time}</span>
                   </span>
                 </li>
               ))}

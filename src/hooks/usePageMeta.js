@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 
-const SITE = "HooBank";
-const DEFAULT_TITLE = "HooBank — The Next Generation Payment Method";
+const SITE = "Northvault";
+const DEFAULT_TITLE = "Northvault — Business banking for freelancers and small teams";
 const DEFAULT_DESCRIPTION =
-  "HooBank is the next generation payment method: rewarding cards, instant transfers, smart budgeting and bank-grade security in one beautiful app.";
+  "Northvault is a concept business bank for freelancers and small teams: multi-currency accounts, cards, invoices and transfers in one calm workspace.";
 
 const setMeta = (attr, key, content) => {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);

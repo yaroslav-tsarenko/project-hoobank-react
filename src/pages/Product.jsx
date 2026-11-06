@@ -1,88 +1,105 @@
 import { useEffect, useState } from "react";
-import { CTA } from "../components";
 import Button from "../components/Button";
-import { DonutChart } from "../components/ui/charts";
+import CTA from "../components/CTA";
 import Container from "../components/ui/Container";
 import CreditCard from "../components/ui/CreditCard";
 import Icon from "../components/ui/Icon";
 import PageHero from "../components/ui/PageHero";
+import Phone from "../components/ui/Phone";
 import Reveal from "../components/ui/Reveal";
 import SectionHeading from "../components/ui/SectionHeading";
 import CurrencyConverter from "../components/widgets/CurrencyConverter";
 import FinanceCalculator from "../components/widgets/FinanceCalculator";
-import { bill } from "../assets";
-import { storeLinks } from "../constants";
-import { savingsGoals } from "../constants/dashboard";
+import { initialTransactions, openInvoices, savingsGoals, spendingCategories } from "../constants/dashboard";
 import usePageMeta from "../hooks/usePageMeta";
+import { fmt, signed, usd0 } from "../lib/format";
 
 const STEPS = [
-  { id: "open", icon: "smartphone", title: "Open an account in minutes", text: "Verify your ID with a selfie and you're in. No branch visits, no paperwork." },
-  { id: "card", icon: "card", title: "Get your card instantly", text: "A virtual card is ready the moment you sign up — your designed physical card ships in days." },
-  { id: "track", icon: "pieChart", title: "Track every dollar", text: "Spending is categorised automatically so you always know where your money goes." },
-  { id: "grow", icon: "trendingUp", title: "Grow your savings", text: "Set goals, round up purchases and earn 4.2% APY on every savings pot." },
+  { id: "open", title: "Open a workspace", text: "Photo ID, a selfie and your business details. Sole traders can start with personal ID only." },
+  { id: "card", title: "Get your cards", text: "A virtual card is ready straight away; the physical card follows in three to five working days." },
+  { id: "invoice", title: "Send your first invoice", text: "Your account details are filled in for you. Reminders go out on the schedule you choose." },
+  { id: "pots", title: "Split every payment", text: "Tax, reserve, operating and pay-yourself pots fill up as client payments land." },
 ];
 
 const Screen = ({ step }) => {
   switch (step) {
     case "open":
       return (
-        <div className="flex flex-col gap-3 p-4">
-          <p className="font-poppins font-semibold text-white text-[15px]">Create account</p>
-          <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full w-2/3 bg-blue-gradient" /></div>
-          {["Full name", "Email", "Phone"].map((f) => (
-            <div key={f} className="rounded-[10px] bg-white/5 border border-white/10 px-3 py-2.5 font-poppins text-[12px] text-dimWhite">{f}</div>
+        <div className="flex flex-col gap-3 px-5 py-3">
+          <p className="font-serif text-[26px] leading-tight text-ink">Your business</p>
+          <div className="h-[2px] bg-line">
+            <div className="h-full w-2/3 bg-forest" />
+          </div>
+          {[
+            ["Trading name", "Morgan Studio"],
+            ["Business type", "Sole trader"],
+            ["Country", "Germany"],
+          ].map(([k, v]) => (
+            <div key={k} className="rounded-[8px] bg-paper border border-line px-3 py-2">
+              <p className="font-sans text-[11px] text-muted">{k}</p>
+              <p className="font-sans text-[13px] text-ink">{v}</p>
+            </div>
           ))}
-          <div className="rounded-[10px] bg-blue-gradient text-primary text-center py-2.5 font-poppins font-medium text-[13px] mt-2">Continue</div>
-          <p className="font-poppins text-[11px] text-dimWhite text-center">Step 2 of 3 · ID check</p>
+          <div className="rounded-full bg-forest text-ivory text-center py-2.5 font-sans font-medium text-[13px] mt-2">Continue</div>
+          <p className="font-sans text-[11px] text-muted text-center">Step 2 of 3 · ID check next</p>
         </div>
       );
     case "card":
       return (
-        <div className="p-4 flex flex-col gap-4">
-          <p className="font-poppins font-semibold text-white text-[15px]">Your cards</p>
-          <CreditCard design={{ color: "cyan", finish: "glossy", name: "Alex Morgan", tier: "Plus" }} tilt={false} />
+        <div className="px-5 py-3 flex flex-col gap-4">
+          <p className="font-serif text-[26px] leading-tight text-ink">Cards</p>
+          <CreditCard design={{ color: "forest", finish: "linen", name: "Alex Morgan", tier: "Studio" }} tilt={false} />
           <div className="grid grid-cols-3 gap-2">
             {["Freeze", "Details", "Limits"].map((a) => (
-              <div key={a} className="rounded-[10px] bg-white/5 py-2 text-center font-poppins text-[11px] text-dimWhite">{a}</div>
+              <div key={a} className="rounded-[8px] border border-line bg-paper py-2 text-center font-sans text-[11px] text-ink">
+                {a}
+              </div>
             ))}
+          </div>
+          <div className="border-t border-line pt-3">
+            <p className="font-sans text-[11px] text-muted">Virtual · Software subscriptions</p>
+            <p className="font-sans text-[13px] text-ink num">•••• 3307 · $400 monthly cap</p>
           </div>
         </div>
       );
-    case "track":
+    case "invoice":
       return (
-        <div className="p-4 flex flex-col items-center gap-3">
-          <p className="font-poppins font-semibold text-white text-[15px] self-start">November spending</p>
-          <DonutChart
-            size={170}
-            thickness={18}
-            centerTitle="Spent"
-            centerValue="$1,980"
-            data={[
-              { label: "Shopping", value: 690, color: "#5ce1e6" },
-              { label: "Food", value: 420, color: "#fc67fa" },
-              { label: "Travel", value: 520, color: "#f6c26b" },
-              { label: "Bills", value: 350, color: "#7c8cff" },
-            ]}
-          />
+        <div className="px-5 py-3 flex flex-col gap-3">
+          <p className="font-serif text-[26px] leading-tight text-ink">Invoices</p>
+          <ul className="border-t border-line">
+            {openInvoices.map((inv) => (
+              <li key={inv.id} className="flex items-center justify-between py-2.5 border-b border-line">
+                <span>
+                  <span className="block font-sans text-[13px] text-ink">{inv.client}</span>
+                  <span className="block font-sans text-[11px] text-muted num">{inv.id}</span>
+                </span>
+                <span className="text-right">
+                  <span className="block font-sans text-[13px] text-ink num">{fmt(inv.amount, inv.currency, 0)}</span>
+                  <span className={`block font-sans text-[11px] ${inv.status === "Overdue" ? "text-negative" : "text-muted"}`}>{inv.status}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="rounded-full border border-ink/25 text-ink text-center py-2 font-sans font-medium text-[12px]">New invoice</div>
         </div>
       );
     default:
       return (
-        <div className="p-4 flex flex-col gap-4">
-          <p className="font-poppins font-semibold text-white text-[15px]">Savings goals</p>
+        <div className="px-5 py-3 flex flex-col gap-4">
+          <p className="font-serif text-[26px] leading-tight text-ink">Pots</p>
           {savingsGoals.map((g) => (
             <div key={g.id}>
-              <div className="flex justify-between font-poppins text-[12px] mb-1.5">
-                <span className="text-white">{g.name}</span>
-                <span className="text-dimWhite">{Math.round((g.saved / g.target) * 100)}%</span>
+              <div className="flex justify-between font-sans text-[12px] mb-1.5">
+                <span className="text-ink">{g.name}</span>
+                <span className="text-muted num">{usd0(g.saved)}</span>
               </div>
-              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: `${(g.saved / g.target) * 100}%`, background: g.color }} />
+              <div className="h-[3px] bg-line">
+                <div className="h-full" style={{ width: `${(g.saved / g.target) * 100}%`, background: g.color }} />
               </div>
             </div>
           ))}
-          <div className="rounded-[12px] bg-white/5 p-3 font-poppins text-[12px] text-dimWhite">
-            <span className="text-gradient font-semibold">+$34.20</span> interest earned this month
+          <div className="rounded-[8px] bg-paper border border-line p-3 font-sans text-[12px] text-muted">
+            <span className="text-forest font-semibold num">+$1,600.00</span> moved to Income tax from INV-0142
           </div>
         </div>
       );
@@ -100,27 +117,20 @@ const ProductTour = () => {
   }, [paused]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)} onFocus={() => setPaused(true)}>
-      <ol className="flex flex-col gap-3" aria-label="Product tour steps">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)} onFocus={() => setPaused(true)}>
+      <ol className="md:col-span-6 border-t border-line" aria-label="Product tour steps">
         {STEPS.map((s, i) => {
           const on = i === active;
           return (
-            <li key={s.id}>
-              <button
-                type="button"
-                onClick={() => setActive(i)}
-                aria-current={on ? "step" : undefined}
-                className={`w-full text-left rounded-[20px] p-5 flex gap-4 transition border ${on ? "bg-black-gradient border-white/10 box-shadow" : "border-transparent hover:bg-white/[0.03]"}`}
-              >
-                <span className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center transition ${on ? "bg-blue-gradient text-primary" : "bg-dimBlue text-secondary"}`}>
-                  <Icon name={s.icon} size={22} />
-                </span>
-                <span className="flex-1">
-                  <span className="block font-poppins font-semibold text-white text-[18px]">{s.title}</span>
-                  <span className={`block font-poppins text-dimWhite text-[15px] leading-[24px] transition-all ${on ? "mt-1 opacity-100" : "opacity-70"}`}>{s.text}</span>
+            <li key={s.id} className="border-b border-line">
+              <button type="button" onClick={() => setActive(i)} aria-current={on ? "step" : undefined} className="w-full text-left py-6 grid grid-cols-[48px_1fr] gap-4 group">
+                <span className={`font-serif text-[34px] leading-none num transition-colors ${on ? "text-forest" : "text-faint group-hover:text-ink"}`}>{i + 1}</span>
+                <span>
+                  <span className={`block font-serif text-[28px] leading-tight transition-colors ${on ? "text-ink" : "text-muted group-hover:text-ink"}`}>{s.title}</span>
+                  <span className={`block font-sans text-[15px] leading-[1.6] text-muted overflow-hidden transition-all ${on ? "max-h-24 mt-2 opacity-100" : "max-h-0 opacity-0"}`}>{s.text}</span>
                   {on && (
-                    <span className="block h-1 rounded-full bg-white/10 mt-4 overflow-hidden">
-                      <span key={`${active}-${paused}`} className={`block h-full bg-blue-gradient ${paused ? "w-full" : "tour-progress"}`} />
+                    <span className="block h-[2px] bg-line mt-4 overflow-hidden">
+                      <span key={`${active}-${paused}`} className={`block h-full bg-forest ${paused ? "w-full" : "tour-progress"}`} />
                     </span>
                   )}
                 </span>
@@ -130,94 +140,107 @@ const ProductTour = () => {
         })}
       </ol>
 
-      <div className="relative flex justify-center">
-        <div className="absolute w-[70%] h-[70%] blue__gradient" aria-hidden="true" />
-        <div className="absolute w-[40%] h-[40%] top-0 right-10 pink__gradient" aria-hidden="true" />
-        <div className="relative w-[290px] h-[580px] rounded-[44px] bg-[#05070f] border border-white/10 p-3 shadow-[0_40px_120px_-30px_rgba(51,187,207,0.45)]">
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 rounded-b-[16px] bg-black z-10" aria-hidden="true" />
-          <div className="w-full h-full rounded-[34px] bg-primary overflow-hidden flex flex-col">
-            <div className="flex justify-between px-6 pt-3 pb-2 font-poppins text-[11px] text-white">
-              <span>9:41</span>
-              <span>HooBank</span>
-            </div>
-            <div key={STEPS[active].id} className="flex-1 animate-fade-up" aria-live="polite">
+      <div className="md:col-span-6 flex justify-center">
+        <div className="rounded-card bg-sand/70 border border-line w-full flex justify-center py-12">
+          <Phone active={active}>
+            <div key={STEPS[active].id} className="h-full animate-fade-up" aria-live="polite">
               <Screen step={STEPS[active].id} />
             </div>
-            <div className="grid grid-cols-4 border-t border-white/10 py-3">
-              {["home", "card", "pieChart", "user"].map((ic, i) => (
-                <span key={ic} className={`flex justify-center ${i === active ? "text-secondary" : "text-white/40"}`}>
-                  <Icon name={ic} size={18} />
-                </span>
-              ))}
-            </div>
-          </div>
+          </Phone>
         </div>
       </div>
     </div>
   );
 };
 
+const MobileLedger = () => (
+  <Phone active={0}>
+    <div className="px-5 py-3">
+      <p className="font-sans text-[12px] text-muted">USD account</p>
+      <p className="font-serif text-[34px] leading-tight text-ink num">$48,210.64</p>
+      <ul className="mt-3 border-t border-line">
+        {initialTransactions.slice(0, 7).map((t) => (
+          <li key={t.id} className="flex items-center justify-between gap-2 py-2 border-b border-line">
+            <span className="min-w-0">
+              <span className="block font-sans text-[12px] text-ink truncate">{t.name}</span>
+              <span className="block font-sans text-[10px] text-muted">{spendingCategories[t.category].label}</span>
+            </span>
+            <span className={`font-sans text-[12px] num shrink-0 ${t.amount > 0 ? "text-positive" : "text-ink"}`}>{signed(t.amount)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Phone>
+);
+
 const Product = () => {
-  usePageMeta("Product tour", "Take a tour of the HooBank app: open an account in minutes, get your card instantly, track spending and grow your savings.");
+  usePageMeta("Product tour", "A tour of Northvault: open a workspace, get cards, send invoices and split every payment into pots.");
   return (
     <>
       <PageHero
         eyebrow="Product tour"
-        title="One app."
-        highlight="Your whole financial life."
-        description="See how HooBank works, from sign-up to savings goals. Everything below is interactive — go ahead and play."
+        title="From first invoice to"
+        highlight="year-end export."
+        description="How a working week looks in Northvault. Everything on this page is interactive, so go ahead and press things."
       >
         <Button to="#tour">Start the tour</Button>
         <Button to="/dashboard" variant="outline">
-          Open live demo
+          Open the demo workspace
         </Button>
       </PageHero>
 
-      <Container id="tour" className="py-12">
-        <SectionHeading eyebrow="How it works" title="From zero to banking in four steps" className="mb-12" />
+      <Container id="tour" className="py-16 sm:py-24">
+        <SectionHeading index="01" eyebrow="How it works" title="Four steps to a working account." className="mb-12" />
         <ProductTour />
       </Container>
 
-      <Container id="calculator" className="py-16">
-        <SectionHeading eyebrow="Calculators" title="Plan ahead with real numbers" description="Estimate savings growth or see how much a 0% balance transfer saves you." className="mb-10" />
+      <Container id="calculator" className="py-16 sm:py-24 border-t border-line">
+        <SectionHeading index="02" eyebrow="Planning" title="Plan with real numbers." description="Estimate a tax reserve or see how long your cash would last at the current pace." className="mb-12" />
         <Reveal>
           <FinanceCalculator />
         </Reveal>
       </Container>
 
-      <Container id="converter" className="py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <Container id="converter" className="py-16 sm:py-24 border-t border-line">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           <SectionHeading
-            eyebrow="Multi-currency"
-            title="Spend like a local, anywhere."
-            description="Hold 30+ currencies and convert instantly at the real mid-market rate. No markups, no surprises."
+            className="md:col-span-5"
+            index="03"
+            eyebrow="Currency"
+            title="Hold it, convert it, or pay with it."
+            description="Keep euros for euro costs, convert the rest when the rate suits you. The fee is a fixed percentage over mid-market, written next to the result."
           >
-            <div className="flex flex-wrap gap-4 mt-8">
-              <Button to="/features/global-transfers" variant="outline">
-                Global transfers
-              </Button>
-            </div>
+            <Button to="/features/multi-currency-accounts" variant="outline" className="mt-8">
+              Multi-currency accounts
+            </Button>
           </SectionHeading>
-          <Reveal delay={100}>
+          <Reveal delay={100} className="md:col-span-6 md:col-start-7">
             <CurrencyConverter />
           </Reveal>
         </div>
       </Container>
 
-      <Container className="py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <Reveal>
-            <img src={bill} alt="HooBank app screens: recent transactions, checkout and payment confirmation" loading="lazy" width="900" height="834" className="w-full h-auto" />
-          </Reveal>
-          <SectionHeading eyebrow="Mobile app" title="Banking that fits in your pocket" description="Available on iOS and Android with Face ID, widgets and instant notifications.">
-            <div className="flex flex-wrap gap-4 mt-8">
-              <Button href={storeLinks.apple} variant="outline" aria-label="Download on the App Store (opens in a new tab)">
-                <Icon name="download" size={18} /> App Store
-              </Button>
-              <Button href={storeLinks.google} variant="outline" aria-label="Get it on Google Play (opens in a new tab)">
-                <Icon name="download" size={18} /> Google Play
-              </Button>
+      <Container className="py-16 sm:py-24 border-t border-line">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+          <Reveal className="md:col-span-6 flex justify-center">
+            <div className="rounded-card bg-forest w-full flex justify-center py-12">
+              <MobileLedger />
             </div>
+          </Reveal>
+          <SectionHeading
+            className="md:col-span-5 md:col-start-8"
+            index="04"
+            eyebrow="On your phone"
+            title="The same ledger, in your pocket."
+            description="The concept is designed mobile-first: approve a payment, snap a receipt or freeze a card from the queue at the post office."
+          >
+            <ul className="mt-8 w-full border-t border-line">
+              {["Passkey sign-in with Face ID or fingerprint", "Receipts captured from the camera", "Push notifications for every payment"].map((t) => (
+                <li key={t} className="flex gap-3 py-3 border-b border-line font-sans text-[15px] text-ink">
+                  <Icon name="check" size={18} className="text-forest mt-0.5" /> {t}
+                </li>
+              ))}
+            </ul>
           </SectionHeading>
         </div>
         <CTA />
